@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Add Cafe</title>
+</head>
+<body>
+
+<h1>Add Cafe</h1>
+<form action = "/addCafeSubmit" method="post">
+  <table>
+    <tr>
+      <td>Cafe name</td>
+      <td><input name="cafeName" type="text" placeholder="Cafe Name Here"/></td>
+    </tr>
+  </table>
+    Address:
+  <table>
+    <tr>
+      <td>Unit Number</td>
+      <td><input name="unitNumber" type="text" placeholder="Unit Number Here"/></td>
+    </tr>
+    <tr>
+      <td>Street Name</td>
+      <td><input name="streetName" type="text" placeholder="Street Name Here"/></td>
+    </tr>
+    <tr>
+      <td>State</td>
+      <td>
+        <select name="state">
+          <option placeholder="Select State">Select State</option>
+          <option value="Victoria">Victoria</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Postcode</td>
+      <td><input name="postcode" type="text" placeholder="Enter postcode"/></td>
+    </tr>
+    <tr>
+      <td>Suburb</td>
+      <td>
+        <select name="suburb">
+          <option placeholder="Select Suburb">Select Suburb</option>
+          <option value="Mitcham">Mitcham</option>
+        </select>
+      </td>
+    </tr>
+  </table>
+  <input type = "submit" value="Let's Go!"/>
+  <input type="button" value="Reset Form" onClick="window.location.reload()">
+</form>
+
+</body>
+</html>
