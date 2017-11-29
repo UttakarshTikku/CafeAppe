@@ -24,6 +24,6 @@ app.get('/viewCafe', function (req, res) {
     res.sendFile(constants.PATH.VIEW_CAFE_PATH);
 });
 
-var server = app.listen(63342, function () {
+var server = app.listen(5000, function () {
     console.log('Node server is running..');
 });
