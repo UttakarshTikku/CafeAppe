@@ -6,14 +6,4 @@ client.connect();
 
 
 
-
-//client.query(
-//    "select id, name from department where id = 1", (err, res ) => {
-//    if (err){
-//        console.log(err);
-//    }
-//    console.log(res.rows[0].name);
-//    client.end();
-//});
-
 module.exports = client;

@@ -1,4 +1,6 @@
 var express = require('express');
+var constants = require('./CafeAppeClient/resources/mappings');
+
 var app = express();
 
 var bodyParser = require("body-parser");
@@ -11,11 +13,15 @@ app.post('/addCafeSubmit', function (req, res) {
 });
 
 app.get('/', function (req, res) {
-    res.sendFile('C:/Users/Uttakarsh/Desktop/CafeAppe/CafeAppeSrc/html/addCafe.html');
+    res.sendFile(constants.ADMIN_PAGE_PATH);
 });
 
 app.get('/addCafe', function (req, res) {
-    res.sendFile('C:/Users/Uttakarsh/Desktop/CafeAppe/CafeAppeSrc/html/addCafe.html');
+    res.sendFile(constants.ADD_CAFE_PATH);
+});
+
+app.get('/viewCafe', function (req, res) {
+    res.sendFile(constants.VIEW_CAFE_PATH);
 });
 
 var server = app.listen(5000, function () {
