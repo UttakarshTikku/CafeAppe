@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Add Cafe</title>
+</head>
+<body>
+
+<h1>Add Cafe</h1>
+<form>
+  <table>
+    <tr>
+      <td>Cafe name</td>
+      <td><input id="cafeName" type="text" placeholder="Cafe Name Here"/></td>
+    </tr>
+    Address:
+    <tr>
+      <td>Unit Number</td>
+      <td><input id="unitNumber" type="text" placeholder="Unit Number Here"/></td>
+    </tr>
+    <tr>
+      <td>Street Name</td>
+      <td><input id="streetName" type="text" placeholder="Street Name Here"/></td>
+    </tr>
+    <tr>
+      <td>Unit Number</td>
+      <td><input id="unitNumber" type="text" placeholder="Unit Number Here"/></td>
+    </tr>
+  </table>
+</form>
+
+</body>
+</html>
