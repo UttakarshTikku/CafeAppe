@@ -1,7 +1,9 @@
-var express = require('./node-postgres-todo/node_modules/express');
+var os = require('os');
+var express = require('express');
 var constants = require('./CafeAppeClient/resources/mappings');
 
-var querystring = require('./node-postgres-todo/node_modules/querystring');
+
+var querystring = require('querystring');
 var http = require('http');
 
 
@@ -43,16 +45,18 @@ app.post('/addCafeSubmit', function(req, res) {
 });
 
 app.get('/', function (req, res) {
-    res.sendFile(constants.PATH.ADMIN_PAGE_PATH);
+
+  console.log(os.platform());
+    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADMIN_PAGE_PATH);
 });
 
 app.get('/addCafe', function (req, res) {
 
-    res.sendFile(constants.PATH.ADD_CAFE_PATH);
+    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADD_CAFE_PATH);
 });
 
 app.get('/viewCafe', function (req, res) {
-    res.sendFile(constants.PATH.VIEW_CAFE_PATH);
+    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH);
 });
 
 var server = app.listen(63342, function () {
