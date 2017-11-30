@@ -27,12 +27,13 @@
       View Menu
     </th>
   </tr>
+  <% cafes.forEach(function(cafe) { %>
   <tr>
     <td>
-      Shingle Inn
+      <%= cafe.name %>
     </td>
     <td>
-      <a href ="/cafeAdmin">Manage</a>
+      <a href ="/cafeAdmin?cafeId=<%= cafe.id %>">Manage</a>
     </td>
     <td>
       <button>Edit</button>
@@ -47,7 +48,8 @@
       <button>Menu</button>
     </td>
   </tr>
-  <tr>
+  <% }); %>
+  <!-- <tr>
     <td>
       Michele's Pattiseries
     </td>
@@ -66,7 +68,7 @@
     <td>
       <button>Menu</button>
     </td>
-  </tr>
+  </tr> -->
 </table>
 
 <p><a href = "/archivedCafe">View Archived Cafes...</a></p>

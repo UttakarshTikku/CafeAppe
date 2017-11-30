@@ -1,4 +1,5 @@
 var os = require('os');
+var url = require('url');
 var express = require('express');
 var constants = require('./CafeAppeClient/resources/mappings');
 
@@ -11,6 +12,7 @@ var app = express();
 
 var bodyParser = require("./node-postgres-todo/node_modules/body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
+app.set('view engine', 'ejs');
 
 app.post('/addCafeSubmit', function(req, res) {
     /*req.username = req.body.cafeName;
@@ -56,10 +58,19 @@ app.get('/addCafe', function (req, res) {
 });
 
 app.get('/viewCafe', function (req, res) {
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH);
+    var cafes = [
+        { id: '1', name: 'Shingle Inn'  },
+        { id: '2', name: "Michele's Pattiseries"  },
+        { id: '3', name: 'Chocolate Factory'  }
+    ];
+    res.render(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH, {
+        cafes: cafes
+    });
+    // res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH);
 });
 
 app.get('/cafeAdmin', function (req, res) {
+    console.log(req.query.cafeId);
     res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH);
 });
 
