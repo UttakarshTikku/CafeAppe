@@ -1,4 +1,3 @@
-var os = require('os');
 var url = require('url');
 var express = require('express');
 var constants = require('./CafeAppeClient/resources/mappings');
@@ -15,18 +14,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 
 app.post('/addCafeSubmit', function(req, res) {
-    /*req.username = req.body.cafeName;
-    var name = req.body.cafeName;
-    console.log(name);
-    res.redirect(307, 'http://localhost:5000/addCafeSubmits'); */
-    //res.send(name + ' Submitted Successfully!');
     var data = querystring.stringify({
         username: req.body.cafeName
     });
-
     var options = {
         host: 'localhost',
-        port: 5000,
+        port: 5001,
         path: '/addCafeSubmits',
         method: 'POST',
         headers: {
@@ -34,7 +27,6 @@ app.post('/addCafeSubmit', function(req, res) {
             'Content-Length': Buffer.byteLength(data)
         }
     };
-
     var httpreq = http.request(options, function (response) {
         response.setEncoding('utf8');
         response.on('data', function (chunk) {
@@ -58,15 +50,47 @@ app.get('/addCafe', function (req, res) {
 });
 
 app.get('/viewCafe', function (req, res) {
-    var cafes = [
-        { id: '1', name: 'Shingle Inn'  },
-        { id: '2', name: "Michele's Pattiseries"  },
-        { id: '3', name: 'Chocolate Factory'  }
-    ];
-    res.render(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH, {
-        cafes: cafes
-    });
-    // res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH);
+    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH);
+});
+
+app.post('/getCafeList', function (req, res) {
+var dbPromise = new Promise( function(resolve, reject){
+  var options = {
+      host: 'localhost',
+      port: 5001,
+      path: '/getCafes',
+      method: 'POST'
+  };
+
+var str = '';
+  var httpreq = http.request(options, function (response) {
+    response.setEncoding('utf8');
+    response.on('data', function (chunk) {
+    str += chunk;
+
+  });
+    response.on('end', function () {
+      resolve(str);
+  });
+});
+  httpreq.end();
+});
+
+
+var promiseCall = function(){
+  dbPromise.then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({id:temp.stateid,name:temp.statename});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+  }).catch(function(error){
+  console.log(console.error);
+  })
+};
+promiseCall();
 });
 
 app.get('/cafeAdmin', function (req, res) {

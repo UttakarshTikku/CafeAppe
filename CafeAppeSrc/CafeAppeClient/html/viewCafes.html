@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Console</title>
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
+<script>
+$(document).ready(function(){
+  $('#tt').datagrid({
+    width:500,
+    height:250,
+    remoteSort:false,
+    singleSelect:true,
+    nowrap:false,
+    fitColumns:true,
+    url:'/getCafeList',
+    columns:[[
+        {field:'id',title:'Cafe Id',width:80},
+        {field:'name',title:'Cafe Name',width:100,sortable:true}
+    ]],
+    detailFormatter: function(rowIndex, rowData){
+        return '<table><tr>' +
+                '<td rowspan=2 style="border:0">'+ rowData.id +'</td>' +
+                '<td style="border:0">' +
+                 rowData.name +
+                '</td>' +
+                '</tr></table>';
+    }
+  });
+});
+</script>
+</head>
+<body>
+
+<h1>List of Cafes</h1>
+<table id="tt"></table>
+
+<p><a href = "/archivedCafe">View Archived Cafes...</a></p>
+</body>
+</html>

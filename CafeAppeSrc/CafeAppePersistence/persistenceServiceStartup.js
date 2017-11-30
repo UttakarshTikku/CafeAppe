@@ -13,6 +13,17 @@ app.get('/getAllProducts', function (req, res) {
   console.log(productDAO.viewProduct());
 });
 
+app.post('/getCafes', function (req, res){
+  var a = function(){
+      productDAO.getStates.then(function(fulfilled){
+      return res.send(fulfilled);
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+  return a();
+});
+
 var server = app.listen(5001, function () {
     console.log('Node server is running..');
 });
