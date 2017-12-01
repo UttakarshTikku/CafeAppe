@@ -1,5 +1,5 @@
 var url = require('url');
-var express = require('express');
+var express = require('./node-postgres-todo/node_modules/express');
 var constants = require('./CafeAppeClient/resources/mappings');
 
 
@@ -46,6 +46,9 @@ app.get('/', function (req, res) {
 
 app.get('/addCafe', function (req, res) {
 
+    console.log('dsa');
+    console.log(constants.PATH.PROJECT_PATH);
+    console.log(constants.PATH.PROJECT_PATH + constants.PATH.ADD_CAFE_PATH);
     res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADD_CAFE_PATH);
 });
 
@@ -87,11 +90,44 @@ var promiseCall = function(){
     res.contentType('application/json');
     res.send(JSON.stringify(result));
   }).catch(function(error){
-  console.log(console.error);
+  console.log(error);
   })
 };
 promiseCall();
 });
+
+
+
+app.post('/addProductSubmit', function(req, res) {
+    var data = querystring.stringify({
+        pName: req.body.pName,
+        pDesc: req.body.pDesc,
+        pSize: req.body.pSize,
+        pPrice: req.body.pPrice
+    });
+    var options = {
+        host: 'localhost',
+        port: 5001,
+        path: '/addProductSubmits',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+    var httpreq = http.request(options, function (response) {
+        response.setEncoding('utf8');
+        response.on('data', function (chunk) {
+            console.log("body: " + chunk);
+        });
+
+    });
+    httpreq.write(data);
+    httpreq.end();
+});
+
+
+
 
 app.get('/cafeAdmin', function (req, res) {
     console.log(req.query.cafeId);

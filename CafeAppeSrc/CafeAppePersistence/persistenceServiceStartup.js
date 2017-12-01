@@ -1,10 +1,10 @@
-var express = require('express');
+var express = require('../node-postgres-todo/node_modules/express');
 
 var constants = require('./resources/constants');
  var productDAO = require('./DAO/productDAO');
 
 var app = express();
-var bodyParser = require("body-parser");
+var bodyParser = require("../node-postgres-todo/node_modules/body-parser");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -22,6 +22,13 @@ app.post('/getCafes', function (req, res){
     });
   }
   return a();
+});
+
+
+app.post('/addProductSubmits', function (req, res){
+    console.log(req.body.pName);
+    console.log(req.body.pName + req.body.pDesc + req.body.pPrice + req.body.pSize);
+    productDAO.createProduct(1,req.body.pName,true,1,new Date(),new Date(),1);
 });
 
 var server = app.listen(5001, function () {
