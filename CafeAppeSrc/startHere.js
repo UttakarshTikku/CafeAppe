@@ -13,40 +13,56 @@ var bodyParser = require("./node-postgres-todo/node_modules/body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 
-app.post('/addCafeSubmit', function(req, res) {
-    var data = querystring.stringify({
-        username: req.body.cafeName
-    });
-    var options = {
-        host: 'localhost',
-        port: 5001,
-        path: '/addCafeSubmits',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(data)
-        }
-    };
-    var httpreq = http.request(options, function (response) {
-        response.setEncoding('utf8');
-        response.on('data', function (chunk) {
-            console.log("body: " + chunk);
-        });
-
-    });
-    httpreq.write(data);
-    httpreq.end();
-});
-
 app.get('/', function (req, res) {
-
-  console.log(os.platform());
     res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADMIN_PAGE_PATH);
 });
 
 app.get('/addCafe', function (req, res) {
 
     res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADD_CAFE_PATH);
+});
+
+app.post('/addCafeSubmit', function (req, res) {
+  var dbPromise = new Promise( function(resolve, reject){
+    var data = querystring.stringify({
+        cafeName: req.body.cafeName,
+        unitNumber: req.body.unitNumber,
+        streetName: req.body.streetName,
+        state: req.body.state,
+        postcode: req.body.postcode,
+        suburb: req.body.suburb
+    });
+    var options = {
+        host: 'localhost',
+        port: 5001,
+        path: '/addNewCafe',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+
+    var httpreq = http.request(options, function (response) {
+        response.setEncoding('utf8');
+        response.on('data', function (chunk) {});
+      });
+      httpreq.write(data);
+      httpreq.end();
+    });
+
+
+  var promiseCall = function(){
+    dbPromise.then(function(fulfilled){
+      res.writeHead(302, {
+        'Location': '/viewCafe'
+      });
+      res.end();
+    }).catch(function(error){
+    console.log(console.error);
+    })
+  };
+  promiseCall();
 });
 
 app.get('/viewCafe', function (req, res) {
