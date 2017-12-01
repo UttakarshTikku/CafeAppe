@@ -1,4 +1,4 @@
-var express = require('../node-postgres-todo/node_modules/express');
+var express = require('express');
 
 var constants = require('./resources/constants');
  var productDAO = require('./DAO/productDAO');

@@ -1,5 +1,5 @@
 var url = require('url');
-var express = require('./node-postgres-todo/node_modules/express');
+var express = require('express');
 var constants = require('./CafeAppeClient/resources/mappings');
 
 
