@@ -112,31 +112,49 @@ promiseCall();
 
 
 app.post('/addProductSubmit', function(req, res) {
-    var data = querystring.stringify({
-        pName: req.body.pName,
-        pDesc: req.body.pDesc,
-        pSize: req.body.pSize,
-        pPrice: req.body.pPrice
-    });
-    var options = {
-        host: 'localhost',
-        port: 5001,
-        path: '/addProductSubmits',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(data)
-        }
-    };
-    var httpreq = http.request(options, function (response) {
-        response.setEncoding('utf8');
-        response.on('data', function (chunk) {
-            console.log("body: " + chunk);
+    var dbPromise = new Promise( function(resolve, reject) {
+        var data = querystring.stringify({
+            pName: req.body.pName,
+            pDesc: req.body.pDesc,
+            pSize: req.body.pSize,
+            pPrice: req.body.pPrice
         });
+        var str = '';
+        var options = {
+            host: 'localhost',
+            port: 5001,
+            path: '/addProductSubmits',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(data)
+            }
+        };
+        var httpreq = http.request(options, function (response) {
+            response.setEncoding('utf8');
+            response.on('data', function (chunk) {
+                resolve(str);
+            });
 
+        });
+        httpreq.write(data);
+        httpreq.end();
     });
-    httpreq.write(data);
-    httpreq.end();
+    var productPromiseCall = function(){
+        dbPromise.then(function(fulfilled){
+            // var result = [];
+            // for(var k in JSON.parse(fulfilled).rows) {
+            //     var temp = JSON.parse(fulfilled).rows[k];
+            //     result.push({id:temp.stateid,name:temp.statename});
+            // }
+            //res.contentType('application/json');
+            //res.send(JSON.stringify(result));
+            res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH);
+        }).catch(function(error){
+            console.log(error);
+        })
+    };
+    productPromiseCall();
 });
 
 
