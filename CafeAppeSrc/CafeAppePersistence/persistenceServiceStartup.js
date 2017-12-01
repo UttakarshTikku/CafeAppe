@@ -35,6 +35,7 @@ app.post('/addNewCafe', function (req, res){
   return a();
 });
 
+app.post('/addProductSubmits', function (req, res){
     console.log(req.body.pName);
     console.log(req.body.pName + req.body.pDesc + req.body.pPrice + req.body.pSize);
     productDAO.createProduct(1,req.body.pName,true,1,new Date(),new Date(),1);
