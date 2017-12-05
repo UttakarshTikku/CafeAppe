@@ -2,6 +2,26 @@
 <html>
 <head>
 <title>Add Cafe</title>
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+<script>
+$(document).ready(function(){
+  $('#state').combobox({
+    url: '/getStatesList',
+    valueField: 'id',
+    textField: 'text',
+    onSelect: function(rec){
+      var url= '/getSuburbList?stateId='+rec.id;
+      $('#suburb').combobox("reload", url);
+    }
+  });
+});
+
+</script>
 </head>
 <body>
 
@@ -26,10 +46,7 @@
     <tr>
       <td>State</td>
       <td>
-        <select name="state">
-          <option placeholder="Select State">Select State</option>
-          <option value="Victoria">Victoria</option>
-        </select>
+        <input id="state" name="state" class="easyui-combobox" data-options="valueField:'id',textField:'text'"/>
       </td>
     </tr>
     <tr>
@@ -39,10 +56,7 @@
     <tr>
       <td>Suburb</td>
       <td>
-        <select name="suburb">
-          <option placeholder="Select Suburb">Select Suburb</option>
-          <option value="Mitcham">Mitcham</option>
-        </select>
+        <input id="suburb" name="suburb" class="easyui-combobox" data-options="valueField:'id',textField:'text'"/>
       </td>
     </tr>
   </table>

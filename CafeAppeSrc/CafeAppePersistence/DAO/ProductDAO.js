@@ -47,19 +47,7 @@ module.exports.viewProduct = function (){
         });
 };
 
-module.exports.getStates = new Promise(
-    function (resolve, reject) {
-      dbConnection.query(
-          constants.SQL.GET_ALL_STATES, function(err, res ) {
-              if(err) {
-                reject(err);
-              }
-              else{
-                resolve(JSON.stringify(res));
-              }
-          });
-    }
-);
+
 
 
 module.exports.viewProductById = function(id){

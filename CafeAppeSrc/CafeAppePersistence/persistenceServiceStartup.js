@@ -1,8 +1,9 @@
 var express = require('express');
 
 var constants = require('./resources/constants');
- var productDAO = require('./DAO/productDAO');
- var cafeDAO = require('./DAO/cafeDAO');
+ var productDAO = require('./DAO/ProductDAO');
+ var cafeDAO = require('./DAO/CafeDAO');
+ var generalDAO = require('./DAO/GeneralDAO');
 
 var app = express();
 var bodyParser = require("../node-postgres-todo/node_modules/body-parser");
@@ -10,13 +11,34 @@ var bodyParser = require("../node-postgres-todo/node_modules/body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/getAllProducts', function (req, res) {
-  console.log("Hello World!")
   console.log(productDAO.viewProduct());
 });
 
 app.post('/getCafes', function (req, res){
   var a = function(){
-      productDAO.getStates.then(function(fulfilled){
+      cafeDAO.getCafeList.then(function(fulfilled){
+      return res.send(fulfilled);
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+  return a();
+});
+
+app.post('/getStates', function (req, res){
+  var a = function(){
+      generalDAO.getStates.then(function(fulfilled){
+      return res.send(fulfilled);
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+  return a();
+});
+
+app.post('/getSuburbs', function (req, res){
+  var a = function(){
+      generalDAO.getSuburbs(req.body.stateId).then(function(fulfilled){
       return res.send(fulfilled);
     }).catch(function (error) {
       console.log(error);

@@ -8,5 +8,7 @@ module.exports.SQL = Object.freeze({
     GET_ALL_STATES: 'select * from cafeappe.state',
     ADD_NEW_CAFE: 'insert into CafeAppe.cafe values ($1, $2, $3, $4, $5, $6, current_timestamp, current_timestamp, $7)',
     ADD_NEW_ADDRESS: 'insert into CafeAppe.address(addressid,unitnumber,streetname,suburbid) values ($1, $2, $3, $4)',
-    ADD_NEW_LOCATION: 'insert into CafeAppe.location values ($1, $2, $3)'
+    ADD_NEW_LOCATION: 'insert into CafeAppe.location values ($1, $2, $3)',
+    GET_ALL_SUBURBS_FOR_STATE: 'select suburbid, suburbname from cafeappe.suburb where postcodeid in (select postcodeid from cafeappe.postcode p inner join cafeappe.state s on s.stateid = p.stateid and s.stateid = ($1) )',
+    GET_ALL_CAFES: 'select c.cafeid, c.name as cafename, a.unitNumber, a.streetName, p.stateId from cafeappe.cafe c inner join cafeappe.address a on c.addressId = a.addressId inner join cafeappe.suburb s on a.suburbid = s.suburbid inner join cafeappe.postcode p on s.postcodeid = p.postcodeid'
 })

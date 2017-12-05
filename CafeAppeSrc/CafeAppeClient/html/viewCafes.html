@@ -12,7 +12,7 @@
 <script>
 $(document).ready(function(){
   $('#tt').datagrid({
-    width:500,
+    width:1000,
     height:250,
     remoteSort:false,
     singleSelect:true,
@@ -20,15 +20,15 @@ $(document).ready(function(){
     fitColumns:true,
     url:'/getCafeList',
     columns:[[
-        {field:'id',title:'Cafe Id',width:80},
-        {field:'name',title:'Cafe Name',width:100,sortable:true}
+        {field:'cafeid',title:'Cafe Id',width:80},
+        {field:'cafename',title:'Cafe Name',width:100,sortable:true},
+        {field:'address',title:'Address',width:100,sortable:true}
     ]],
     detailFormatter: function(rowIndex, rowData){
         return '<table><tr>' +
-                '<td rowspan=2 style="border:0">'+ rowData.id +'</td>' +
-                '<td style="border:0">' +
-                 rowData.name +
-                '</td>' +
+                '<td rowspan=2 style="border:0">'+ rowData.cafeid +'</td>' +
+                '<td style="border:0"> <a href = "/viewCafe" > ' + rowData.cafename + ' </a> </td>' 
+                + '<td>' + rowData.address +'</td>'
                 '</tr></table>';
     }
   });

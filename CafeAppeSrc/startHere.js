@@ -98,7 +98,7 @@ var promiseCall = function(){
     var result = [];
     for(var k in JSON.parse(fulfilled).rows) {
       var temp = JSON.parse(fulfilled).rows[k];
-      result.push({id:temp.stateid,name:temp.statename});
+      result.push({cafeid:temp.cafeid,cafename:temp.cafename,address: temp.unitnumber+", "+temp.streetname+", "+temp.stateid});
     }
     res.contentType('application/json');
     res.send(JSON.stringify(result));
@@ -142,13 +142,6 @@ app.post('/addProductSubmit', function(req, res) {
     });
     var productPromiseCall = function(){
         dbPromise.then(function(fulfilled){
-            // var result = [];
-            // for(var k in JSON.parse(fulfilled).rows) {
-            //     var temp = JSON.parse(fulfilled).rows[k];
-            //     result.push({id:temp.stateid,name:temp.statename});
-            // }
-            //res.contentType('application/json');
-            //res.send(JSON.stringify(result));
             res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH);
         }).catch(function(error){
             console.log(error);
@@ -157,8 +150,93 @@ app.post('/addProductSubmit', function(req, res) {
     productPromiseCall();
 });
 
+app.post('/getStatesList', function (req, res) {
+var dbPromise = new Promise( function(resolve, reject){
+  var options = {
+      host: 'localhost',
+      port: 5001,
+      path: '/getStates',
+      method: 'POST'
+  };
+
+var str = '';
+  var httpreq = http.request(options, function (response) {
+    response.setEncoding('utf8');
+    response.on('data', function (chunk) {
+    str += chunk;
+
+  });
+    response.on('end', function () {
+      resolve(str);
+  });
+});
+  httpreq.end();
+});
 
 
+var promiseCall = function(){
+  dbPromise.then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({id:temp.stateid,text:temp.statename});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+  }).catch(function(error){
+  console.log(error);
+  })
+};
+promiseCall();
+});
+
+app.post('/getSuburbList', function (req, res) {
+  var data = querystring.stringify({
+      stateId: req.query.stateId
+  });
+var dbPromise = new Promise( function(resolve, reject){
+  var options = {
+      host: 'localhost',
+      port: 5001,
+      path: '/getSuburbs',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(data)
+      }
+  };
+
+var str = '';
+  var httpreq = http.request(options, function (response) {
+    response.setEncoding('utf8');
+    response.on('data', function (chunk) {
+    str += chunk;
+
+  });
+    response.on('end', function () {
+      resolve(str);
+  });
+});
+  httpreq.write(data);
+  httpreq.end();
+});
+
+
+var promiseCall = function(){
+  dbPromise.then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({id:temp.suburbid,text:temp.suburbname});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+  }).catch(function(error){
+  console.log(error);
+  })
+};
+promiseCall();
+});
 
 app.get('/cafeAdmin', function (req, res) {
     console.log(req.query.cafeId);

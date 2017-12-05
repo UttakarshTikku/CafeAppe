@@ -18,8 +18,7 @@ module.exports.addNewCafe = (cafeid,addressid,name,locationid,activeflag,created
 
 module.exports.addNewAddress = (addressId, unitNumber, streetName, suburbId) => { return new Promise(
   function (resolve, reject) {
-   console.log(addressId);
-      dbConnection.query(
+       dbConnection.query(
           constants.SQL.ADD_NEW_ADDRESS, [addressId, unitNumber, streetName, suburbId],function(err, res ) {
               if(err) {
                 reject(err);
@@ -41,3 +40,17 @@ module.exports.addNewLocation = (locId, longitude, latitude) => { return new Pro
     }
 );
 };
+
+module.exports.getCafeList = new Promise(
+    function (resolve, reject) {
+      dbConnection.query(
+          constants.SQL.GET_ALL_CAFES, function(err, res ) {
+              if(err) {
+                reject(err);
+              }
+              else{
+                resolve(JSON.stringify(res));
+              }
+          });
+    }
+);
