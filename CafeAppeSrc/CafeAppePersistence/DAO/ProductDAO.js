@@ -14,7 +14,7 @@ module.exports.createProduct = function (cafeId, pName, activeFlag, createdBy , 
 module.exports.createProductPromise = function (cafeId, pName, activeFlag, createdBy , createdDateTime, modifiedDateTime, modifiedBy){
     return new Promise(function (resolve, reject) {
         dbConnection.query(
-            constants.SQL.CREATE_PRODUCT, [cafeId, 0, pName, activeFlag, createdBy, createdDateTime, modifiedDateTime, modifiedBy], function(err, res ) {
+            constants.SQL.CREATE_PRODUCT, [cafeId, 1, pName, activeFlag, createdBy, createdDateTime, modifiedDateTime, modifiedBy], function(err, res ) {
                 if(err) {
                     reject(err);
                 }
@@ -39,14 +39,22 @@ module.exports.createProductSizePromise = function (productId, productsizeid, pr
 
 
 
-module.exports.viewProduct = function (){
-    dbConnection.query(
-        constants.SQL.VIEW_PRODUCT, function(err, res ) {
-            if(err) throw err;
-            else console.log(res);
-        });
-};
+module.exports.viewProduct = function() {
+    return new Promise( function (resolve, reject) {
+        dbConnection.query(
+            constants.SQL.VIEW_PRODUCT, function (err, res) {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                else {
+                    //console.log(res);
+                    resolve(res);
+                }
+            });
+    });
 
+}
 
 
 

@@ -1,18 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Cafe List</title>
+    <title>Admin Console</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('#vp').datagrid({
+                width:1000,
+                height:250,
+                remoteSort:false,
+                singleSelect:true,
+                nowrap:false,
+                fitColumns:true,
+                url:'/getProductList',
+                columns:[[
+                    {field:'productid',title:'Product Id',width:80},
+                    {field:'productname',title:'Product Name',width:100,sortable:true},
+                    {field:'productsize',title:'Product Size',width:100,sortable:true},
+                    {field:'productprice',title:'Product Price',width:100,sortable:true}
+                ]],
+                detailFormatter: function(rowIndex, rowData){
+                    return '<table><tr>' +
+                        '<td rowspan=2 style="border:0">'+ rowData.productid +'</td>' +
+                        '<td style="border:0">  + rowData.productname + </a> </td>'
+                        + '<td>' + rowData.productsize +'</td>'
+                        + '<td>' + rowData.productPrice +'</td>'
+                    '</tr></table>';
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
-<table>
-    <td>Name</td>
-    <td>Address</td>
-    <td>Status</td>
-    <td>CreatedBy</td>
+<h1>List of Products</h1>
+<table id="vp"></table>
 
-</table>
+<p><a href = "/addProduct">Add new Product</a></p>
 
+<p><a href = "/archivedCafe">View Archived Cafes...</a></p>
 </body>
 </html>

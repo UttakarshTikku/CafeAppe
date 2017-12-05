@@ -1,5 +1,5 @@
 var url = require('url');
-var express = require('express');
+var express = require('./node-postgres-todo/node_modules/express');
 var constants = require('./CafeAppeClient/resources/mappings');
 
 
@@ -142,13 +142,61 @@ app.post('/addProductSubmit', function(req, res) {
     });
     var productPromiseCall = function(){
         dbPromise.then(function(fulfilled){
-            res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH);
+            res.writeHead(302,{
+             'Location': '/viewProduct'
+            });
+            res.end();
         }).catch(function(error){
             console.log(error);
         })
     };
     productPromiseCall();
 });
+
+
+
+app.post('/getProductList', function (req, res) {
+    console.log('Ina asd');
+    var dbPromise = new Promise( function(resolve, reject){
+        var options = {
+            host: 'localhost',
+            port: 5001,
+            path: '/getProductsList',
+            method: 'POST'
+        };
+
+        var str = '';
+        var httpreq = http.request(options, function (response) {
+            response.setEncoding('utf8');
+            response.on('data', function (chunk) {
+                str += chunk;
+
+            });
+            response.on('end', function () {
+                //console.log(str);
+                resolve(str);
+            });
+        });
+        httpreq.end();
+    });
+
+
+    var promiseCall = function(){
+        dbPromise.then(function(fulfilled){
+            var result = [];
+            for(var k in JSON.parse(fulfilled).rows) {
+                var temp = JSON.parse(fulfilled).rows[k];
+                result.push({productid:temp.productid, productname:temp.productname, productsize:temp.productsizeid, productprice:temp.price});
+            }
+            res.contentType('application/json');
+            res.send(JSON.stringify(result));
+        }).catch(function(error){
+            console.log(error);
+        })
+    };
+    promiseCall();
+});
+
 
 app.post('/getStatesList', function (req, res) {
 var dbPromise = new Promise( function(resolve, reject){
