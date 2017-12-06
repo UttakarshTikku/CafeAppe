@@ -15,8 +15,10 @@ app.get('/getAllProducts', function (req, res) {
 });
 
 app.post('/getCafes', function (req, res){
+  console.log("8. reached persistence service to get cafes");
   var a = function(){
-      cafeDAO.getCafeList.then(function(fulfilled){
+      cafeDAO.getCafeList().then(function(fulfilled){
+        console.log("10. returning back after getting cafe list");
       return res.send(fulfilled);
     }).catch(function (error) {
       console.log(error);
@@ -48,11 +50,13 @@ app.post('/getSuburbs', function (req, res){
 });
 
 app.post('/addNewCafe', function (req, res){
+  console.log("2. Add Cafe Persistence Service Entry");
   var a = function(){
-    console.log(req.body.unitNumber);
-    cafeDAO.addNewLocation(10, 10, 10).then(
-      cafeDAO.addNewAddress(5,req.body.unitNumber, req.body.streetName, 5599)).then(
-        cafeDAO.addNewCafe(1, 5,req.body.cafeName, 10, true, 1, 1));
+    cafeDAO.addNewLocation(10, 10).then(
+      cafeDAO.addNewAddress(req.body.unitNumber, req.body.streetName, req.body.suburb)).then(
+        cafeDAO.addNewCafe( req.body.cafeName, 1, 1)).then(function(fulfilled){
+          console.log("6. Returning after adding cafe");
+        });
   }
   return a();
 });

@@ -19,6 +19,14 @@ $(document).ready(function(){
       $('#suburb').combobox("reload", url);
     }
   });
+  $('#suburb').combobox({
+    valueField: 'id',
+    textField: 'text',
+    onSelect: function(rec){
+      var url= '/getPincodeForSuburb?suburbId='+rec.id;
+      $('#postcode').combobox("reload", url);
+    }
+  });
 });
 
 </script>
@@ -50,15 +58,16 @@ $(document).ready(function(){
       </td>
     </tr>
     <tr>
-      <td>Postcode</td>
-      <td><input name="postcode" type="text" placeholder="Enter postcode"/></td>
-    </tr>
-    <tr>
       <td>Suburb</td>
       <td>
         <input id="suburb" name="suburb" class="easyui-combobox" data-options="valueField:'id',textField:'text'"/>
       </td>
     </tr>
+    <tr>
+      <td>Postcode</td>
+      <td><input id= "postcode" name="postcode" class="easyui-combobox" type="text" readonly placeholder="Your postcode" data-options="valueField:'id',textField:'text'"/></td>
+    </tr>
+
   </table>
   <input type = "submit" value="Let's Go!"/>
   <input type="button" value="Reset Form" onClick="window.location.reload()">

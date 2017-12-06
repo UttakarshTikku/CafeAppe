@@ -20,16 +20,17 @@ $(document).ready(function(){
     fitColumns:true,
     url:'/getCafeList',
     columns:[[
-        {field:'cafeid',title:'Cafe Id',width:80},
         {field:'cafename',title:'Cafe Name',width:100,sortable:true},
         {field:'address',title:'Address',width:100,sortable:true}
     ]],
     detailFormatter: function(rowIndex, rowData){
         return '<table><tr>' +
-                '<td rowspan=2 style="border:0">'+ rowData.cafeid +'</td>' +
-                '<td style="border:0"> <a href = "/viewCafe" > ' + rowData.cafename + ' </a> </td>' 
+                '<td style="border:0">' + rowData.cafename + ' </a> </td>'
                 + '<td>' + rowData.address +'</td>'
                 '</tr></table>';
+    },
+    onClickRow: function(rowIndex, rowData){
+      window.location.href = '/cafeAdmin?cafeId='+rowData.cafeid;
     }
   });
 });

@@ -1,48 +1,53 @@
 var dbConnection = require('../resources/postgresdb');
 var constants = require('../resources/constants');
 
-module.exports.addNewCafe = (cafeid,addressid,name,locationid,activeflag,createdby, modifiedby) => { return new Promise(
+module.exports.addNewCafe = (name,createdby, modifiedby) => { return new Promise(
       function (resolve, reject) {
-      console.log(addressid);
+        console.log("5. Adding Cafe");
       dbConnection.query(
-          constants.SQL.ADD_NEW_CAFE, [cafeid,addressid,name,locationid,activeflag,createdby, modifiedby],
+          constants.SQL.ADD_NEW_CAFE, [name,createdby, modifiedby],
           function(err, res ) {
               if(err) {
                 console.log(err);
                 reject(err);
               }
+              else resolve();
           });
     }
 );
 };
 
-module.exports.addNewAddress = (addressId, unitNumber, streetName, suburbId) => { return new Promise(
+module.exports.addNewAddress = (unitNumber, streetName, suburbId) => { return new Promise(
   function (resolve, reject) {
+    console.log("4. Adding Address");
        dbConnection.query(
-          constants.SQL.ADD_NEW_ADDRESS, [addressId, unitNumber, streetName, suburbId],function(err, res ) {
+          constants.SQL.ADD_NEW_ADDRESS, [unitNumber, streetName, suburbId],function(err, res ) {
               if(err) {
                 reject(err);
               }
+              else resolve();
           });
     }
   );
 };
 
-module.exports.addNewLocation = (locId, longitude, latitude) => { return new Promise(
+module.exports.addNewLocation = ( longitude, latitude) => { return new Promise(
     function (resolve, reject) {
-      console.log(locId);
+      console.log("3. Adding Location");
       dbConnection.query(
-          constants.SQL.ADD_NEW_LOCATION, [locId, longitude, latitude],function(err, res ) {
+          constants.SQL.ADD_NEW_LOCATION, [longitude, latitude],function(err, res ) {
               if(err) {
                 reject(err);
               }
+              else resolve();
           });
     }
 );
 };
 
-module.exports.getCafeList = new Promise(
-    function (resolve, reject) {
+module.exports.getCafeList = () => {
+  return new Promise(function (resolve, reject) {
+      console.log("9. about to hit database!");
       dbConnection.query(
           constants.SQL.GET_ALL_CAFES, function(err, res ) {
               if(err) {
@@ -54,3 +59,4 @@ module.exports.getCafeList = new Promise(
           });
     }
 );
+};

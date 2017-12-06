@@ -23,6 +23,7 @@ app.get('/addCafe', function (req, res) {
 });
 
 app.post('/addCafeSubmit', function (req, res) {
+  console.log("1. add cafe submit");
   var dbPromise = new Promise( function(resolve, reject){
     var data = querystring.stringify({
         cafeName: req.body.cafeName,
@@ -48,7 +49,13 @@ app.post('/addCafeSubmit', function (req, res) {
         response.on('data', function (chunk) {});
       });
       httpreq.write(data);
-      httpreq.end();
+      httpreq.end(function(err, response){
+        if(err)
+          reject(err);
+        else
+          resolve();
+      });
+
     });
 
 
@@ -58,9 +65,7 @@ app.post('/addCafeSubmit', function (req, res) {
         'Location': '/viewCafe'
       });
       res.end();
-    }).catch(function(error){
-    console.log(console.error);
-    })
+    }).catch(function(error){ })
   };
   promiseCall();
 });
@@ -70,6 +75,7 @@ app.get('/viewCafe', function (req, res) {
 });
 
 app.post('/getCafeList', function (req, res) {
+  console.log("7. get cafe data!");
 var dbPromise = new Promise( function(resolve, reject){
   var options = {
       host: 'localhost',
@@ -95,12 +101,14 @@ var str = '';
 
 var promiseCall = function(){
   dbPromise.then(function(fulfilled){
+    console.log("11. Returned back with the list of cafes");
     var result = [];
     for(var k in JSON.parse(fulfilled).rows) {
       var temp = JSON.parse(fulfilled).rows[k];
       result.push({cafeid:temp.cafeid,cafename:temp.cafename,address: temp.unitnumber+", "+temp.streetname+", "+temp.stateid});
     }
     res.contentType('application/json');
+    console.log("12. Returing json of all cafes");
     res.send(JSON.stringify(result));
   }).catch(function(error){
   console.log(error);
