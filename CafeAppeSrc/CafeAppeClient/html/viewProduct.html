@@ -32,9 +32,17 @@
                         + '<td>' + rowData.productsize +'</td>'
                         + '<td>' + rowData.productPrice +'</td>'
                     '</tr></table>';
+                },
+                onDblClickCell: function(index,field,value){
+
+                       window.location.href = '/getSelectedProduct?id='+value
+                    //alert('Cell clicked' + value);
                 }
             });
         });
+
+
+
     </script>
 </head>
 <body>
