@@ -1,5 +1,5 @@
 module.exports.SQL = Object.freeze({
-    DATASOURCE: 'postgres://localhost:5432/akhileshlamba',
+    DATASOURCE: 'postgres://localhost:5432/postgres',
     CREATE_PRODUCT: 'insert into CafeAppe.Product values ($1, $2, $3, $4, $5, $6, $7, $8)',
     VIEW_PRODUCT: 'select p.productid, p.productname, ps.productsizeid, ps.price from CafeAppe.Product p , CafeAppe.productsize ps where p.productid = ps.productid',
     VIEW_PRODUCT_BY_ID: 'select * from CafeAppe.product where productId = ($1)',

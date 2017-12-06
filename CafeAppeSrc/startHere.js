@@ -1,6 +1,8 @@
 var url = require('url');
 var express = require('./node-postgres-todo/node_modules/express');
 var constants = require('./CafeAppeClient/resources/mappings');
+var path = require('path');
+var utils = require('./CafeAppeClient/resources/utils');
 
 
 var querystring = require('querystring');
@@ -14,64 +16,31 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADMIN_PAGE_PATH);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADMIN_PAGE_PATH));
 });
 
 app.get('/addCafe', function (req, res) {
-
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADD_CAFE_PATH);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADD_CAFE_PATH));
 });
 
 app.post('/addCafeSubmit', function (req, res) {
-  console.log("1. add cafe submit");
-  var dbPromise = new Promise( function(resolve, reject){
-    var data = querystring.stringify({
-        cafeName: req.body.cafeName,
-        unitNumber: req.body.unitNumber,
-        streetName: req.body.streetName,
-        state: req.body.state,
-        postcode: req.body.postcode,
-        suburb: req.body.suburb
-    });
-    var options = {
-        host: 'localhost',
-        port: 5001,
-        path: '/addNewCafe',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(data)
-        }
-    };
-
-    var httpreq = http.request(options, function (response) {
-        response.setEncoding('utf8');
-        response.on('data', function (chunk) {});
-      });
-      httpreq.write(data);
-      httpreq.end(function(err, response){
-        if(err)
-          reject(err);
-        else
-          resolve();
-      });
-
-    });
-
-
-  var promiseCall = function(){
-    dbPromise.then(function(fulfilled){
+  utils.persistenceServiceCallWithParams(querystring.stringify({
+      cafeName: req.body.cafeName,
+      unitNumber: req.body.unitNumber,
+      streetName: req.body.streetName,
+      state: req.body.state,
+      postcode: req.body.postcode,
+      suburb: req.body.suburb
+  }),'/addNewCafe').then(function(fulfilled){
       res.writeHead(302, {
         'Location': '/viewCafe'
       });
       res.end();
-    }).catch(function(error){ })
-  };
-  promiseCall();
+    }).catch(function(error){ console.log(error); });
 });
 
 app.get('/viewCafe', function (req, res) {
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH));
 });
 
 app.post('/getCafeList', function (req, res) {
@@ -296,19 +265,19 @@ promiseCall();
 
 app.get('/cafeAdmin', function (req, res) {
     console.log(req.query.cafeId);
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH));
 });
 
 app.get('/viewProduct', function (req, res) {
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_PRODUCT_PATH);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_PRODUCT_PATH));
 });
 
 app.get('/archivedCafe', function (req, res) {
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_ARCHIVED_CAFES);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_ARCHIVED_CAFES));
 });
 
 app.get('/addProduct', function (req, res) {
-    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.ADD_PRODUCT_PATH);
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADD_PRODUCT_PATH));
 });
 
 var server = app.listen(63342, function () {
