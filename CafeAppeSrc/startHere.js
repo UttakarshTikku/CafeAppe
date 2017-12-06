@@ -4,9 +4,8 @@ var constants = require('./CafeAppeClient/resources/mappings');
 var path = require('path');
 var utils = require('./CafeAppeClient/resources/utils');
 
-
 var querystring = require('querystring');
-var http = require('http');
+
 
 
 var app = express();
@@ -32,7 +31,7 @@ app.post('/addCafeSubmit', function (req, res) {
       postcode: req.body.postcode,
       suburb: req.body.suburb
   }),'/addNewCafe').then(function(fulfilled){
-      res.writeHead(302, {
+    res.writeHead(302, {
         'Location': '/viewCafe'
       });
       res.end();
@@ -44,122 +43,37 @@ app.get('/viewCafe', function (req, res) {
 });
 
 app.post('/getCafeList', function (req, res) {
-  console.log("7. get cafe data!");
-var dbPromise = new Promise( function(resolve, reject){
-  var options = {
-      host: 'localhost',
-      port: 5001,
-      path: '/getCafes',
-      method: 'POST'
-  };
-
-var str = '';
-  var httpreq = http.request(options, function (response) {
-    response.setEncoding('utf8');
-    response.on('data', function (chunk) {
-    str += chunk;
-
-  });
-    response.on('end', function () {
-      resolve(str);
-  });
-});
-  httpreq.end();
-});
-
-
-var promiseCall = function(){
-  dbPromise.then(function(fulfilled){
-    console.log("11. Returned back with the list of cafes");
+  utils.persistenceServiceCallSansParams('/getCafes').then(function(fulfilled){
     var result = [];
     for(var k in JSON.parse(fulfilled).rows) {
       var temp = JSON.parse(fulfilled).rows[k];
       result.push({cafeid:temp.cafeid,cafename:temp.cafename,address: temp.unitnumber+", "+temp.streetname+", "+temp.stateid});
     }
     res.contentType('application/json');
-    console.log("12. Returing json of all cafes");
     res.send(JSON.stringify(result));
   }).catch(function(error){
-  console.log(error);
-  })
-};
-promiseCall();
+    console.log(error);
+  });
 });
 
-
-
 app.post('/addProductSubmit', function(req, res) {
-    var dbPromise = new Promise( function(resolve, reject) {
-        var data = querystring.stringify({
-            pName: req.body.pName,
-            pDesc: req.body.pDesc,
-            pSize: req.body.pSize,
-            pPrice: req.body.pPrice
-        });
-        var str = '';
-        var options = {
-            host: 'localhost',
-            port: 5001,
-            path: '/addProductSubmits',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': Buffer.byteLength(data)
-            }
-        };
-        var httpreq = http.request(options, function (response) {
-            response.setEncoding('utf8');
-            response.on('data', function (chunk) {
-                resolve(str);
-            });
-
-        });
-        httpreq.write(data);
-        httpreq.end();
-    });
-    var productPromiseCall = function(){
-        dbPromise.then(function(fulfilled){
+      utils.persistenceServiceCallWithParams(querystring.stringify({
+          pName: req.body.pName,
+          pDesc: req.body.pDesc,
+          pSize: req.body.pSize,
+          pPrice: req.body.pPrice
+      }),'/addProductSubmits').then(function(fulfilled){
             res.writeHead(302,{
              'Location': '/viewProduct'
             });
             res.end();
         }).catch(function(error){
             console.log(error);
-        })
-    };
-    productPromiseCall();
+        });
 });
 
-
-
 app.post('/getProductList', function (req, res) {
-    console.log('Ina asd');
-    var dbPromise = new Promise( function(resolve, reject){
-        var options = {
-            host: 'localhost',
-            port: 5001,
-            path: '/getProductsList',
-            method: 'POST'
-        };
-
-        var str = '';
-        var httpreq = http.request(options, function (response) {
-            response.setEncoding('utf8');
-            response.on('data', function (chunk) {
-                str += chunk;
-
-            });
-            response.on('end', function () {
-                //console.log(str);
-                resolve(str);
-            });
-        });
-        httpreq.end();
-    });
-
-
-    var promiseCall = function(){
-        dbPromise.then(function(fulfilled){
+        utils.persistenceServiceCallSansParams('/getProductsList').then(function(fulfilled){
             var result = [];
             for(var k in JSON.parse(fulfilled).rows) {
                 var temp = JSON.parse(fulfilled).rows[k];
@@ -169,38 +83,12 @@ app.post('/getProductList', function (req, res) {
             res.send(JSON.stringify(result));
         }).catch(function(error){
             console.log(error);
-        })
-    };
-    promiseCall();
+        });
 });
 
 
 app.post('/getStatesList', function (req, res) {
-var dbPromise = new Promise( function(resolve, reject){
-  var options = {
-      host: 'localhost',
-      port: 5001,
-      path: '/getStates',
-      method: 'POST'
-  };
-
-var str = '';
-  var httpreq = http.request(options, function (response) {
-    response.setEncoding('utf8');
-    response.on('data', function (chunk) {
-    str += chunk;
-
-  });
-    response.on('end', function () {
-      resolve(str);
-  });
-});
-  httpreq.end();
-});
-
-
-var promiseCall = function(){
-  dbPromise.then(function(fulfilled){
+  utils.persistenceServiceCallSansParams('/getStates').then(function(fulfilled){
     var result = [];
     for(var k in JSON.parse(fulfilled).rows) {
       var temp = JSON.parse(fulfilled).rows[k];
@@ -209,46 +97,14 @@ var promiseCall = function(){
     res.contentType('application/json');
     res.send(JSON.stringify(result));
   }).catch(function(error){
-  console.log(error);
-  })
-};
-promiseCall();
+    console.log(error);
+  });
 });
 
 app.post('/getSuburbList', function (req, res) {
-  var data = querystring.stringify({
+  utils.persistenceServiceCallWithParamsAndResponse(querystring.stringify({
       stateId: req.query.stateId
-  });
-var dbPromise = new Promise( function(resolve, reject){
-  var options = {
-      host: 'localhost',
-      port: 5001,
-      path: '/getSuburbs',
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(data)
-      }
-  };
-
-var str = '';
-  var httpreq = http.request(options, function (response) {
-    response.setEncoding('utf8');
-    response.on('data', function (chunk) {
-    str += chunk;
-
-  });
-    response.on('end', function () {
-      resolve(str);
-  });
-});
-  httpreq.write(data);
-  httpreq.end();
-});
-
-
-var promiseCall = function(){
-  dbPromise.then(function(fulfilled){
+    }),'/getSuburbs').then(function(fulfilled){
     var result = [];
     for(var k in JSON.parse(fulfilled).rows) {
       var temp = JSON.parse(fulfilled).rows[k];
@@ -258,9 +114,7 @@ var promiseCall = function(){
     res.send(JSON.stringify(result));
   }).catch(function(error){
   console.log(error);
-  })
-};
-promiseCall();
+  });
 });
 
 app.get('/cafeAdmin', function (req, res) {
