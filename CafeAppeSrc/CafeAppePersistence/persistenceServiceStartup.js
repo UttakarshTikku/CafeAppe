@@ -54,7 +54,7 @@ app.post('/addProductSubmits', function (req, res){
         productDAO.createProductPromise(1, req.body.pName, true, 1, new Date(), new Date(), 1)
             .then(function (fulfilled) {
                 //return res.send(fulfilled);
-            }).then(productDAO.createProductSizePromise(1,1, 2.12 , 1.12, true, 1, new Date(), new Date(), 1).then(
+            }).then(productDAO.createProductSizePromise(1,1, req.body.pPrice , 1.12, true, 1, new Date(), new Date(), 1).then(
             function (fulfilled) {
                 return res.send(fulfilled);
             }).catch(function (error) {
@@ -80,6 +80,20 @@ app.post('/getProductsList', function (req, res){
     }
     return a();
 });
+
+app.post('/getProduct', function (req, res){
+    console.log('inb sdewefew');
+    var a = function(){
+        productDAO.getProduct(req.body.id).then(function(fulfilled){
+            //console.log(fulfilled);
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
 
 var server = app.listen(5001, function () {
     console.log('Node server is running..');

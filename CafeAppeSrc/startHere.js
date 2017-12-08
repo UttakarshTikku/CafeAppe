@@ -134,6 +134,34 @@ app.get('/addProduct', function (req, res) {
     res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADD_PRODUCT_PATH));
 });
 
+
+app.get('/getSelectedProduct', function(req, res) {
+    console.log('In here');
+    res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.MANAGE_PRODUCT_PATH);
+});
+
+
+app.get('/getProductSelected', function(req, res) {
+
+    utils.persistenceServiceCallWithParamsAndResponse(querystring.stringify({
+        id: req.query.id
+    }),'/getProduct').then(function(fulfilled){
+        var temp = JSON.parse(fulfilled).rows[0];
+        var result = {
+            pName: temp.productname,
+            pDesc: 'adsssaf',
+            pSize: temp.productsizeid,
+            pPrice: temp.price
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+        //console.log('asdasdsad');
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
 var server = app.listen(63342, function () {
     console.log('Node server is running..');
 });
