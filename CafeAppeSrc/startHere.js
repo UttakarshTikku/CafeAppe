@@ -162,6 +162,26 @@ app.get('/getProductSelected', function(req, res) {
     });
 });
 
+
+app.post('/UpdateProductSubmit', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        pName: req.body.pName,
+        pDesc: req.body.pDesc,
+        pSize: req.body.pSize,
+        pPrice: req.body.pPrice,
+        pId: req.body.productId
+    }),'/updateProductSubmits').then(function(fulfilled){
+        console.log(fulfilled);
+        res.writeHead(302,{
+            'Location': '/viewProduct'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
 var server = app.listen(63342, function () {
     console.log('Node server is running..');
 });

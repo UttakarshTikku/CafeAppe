@@ -95,6 +95,27 @@ app.post('/getProduct', function (req, res){
 });
 
 
+app.post('/updateProductSubmits', function (req, res){
+    console.log(req.body.pName);
+    console.log(req.body.pName + req.body.pDesc + req.body.pPrice + req.body.pSize);
+    var a = function() {
+        productDAO.updateProductPromise(req.body.pId, req.body.pName, new Date(), 1)
+            .then(function (fulfilled) {
+                console.log(fulfilled);
+                return res.send(fulfilled);
+            })/*.then(productDAO.updateProductSizePromise(req.body.productid,1, req.body.pPrice , new Date(), 1).then(
+            function (fulfilled) {
+                return res.send(fulfilled);
+            })*/.catch(function (error) {
+            console.log(error);
+        })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    return a();
+});
+
 var server = app.listen(5001, function () {
     console.log('Node server is running..');
 });
