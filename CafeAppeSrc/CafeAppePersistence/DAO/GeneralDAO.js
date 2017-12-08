@@ -1,9 +1,9 @@
-var dbConnection = require('../resources/postgresdb');
+var connPool = require('../resources/postgresdb');
 var constants = require('../resources/constants');
 
 module.exports.getStates = new Promise(
     function (resolve, reject) {
-      dbConnection.query(
+      connPool.query(
           constants.SQL.GET_ALL_STATES, function(err, res ) {
               if(err) {
                 reject(err);
@@ -17,7 +17,7 @@ module.exports.getStates = new Promise(
 
 module.exports.getSuburbs = (stateid) => { return new Promise(
     function (resolve, reject) {
-      dbConnection.query(
+      connPool.query(
           constants.SQL.GET_ALL_SUBURBS_FOR_STATE, [stateid], function(err, res ) {
               if(err) {
                 reject(err);

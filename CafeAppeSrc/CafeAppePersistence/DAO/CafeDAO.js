@@ -1,13 +1,12 @@
-var dbConnection = require('../resources/postgresdb');
+var connPool = require('../resources/postgresdb');
 var constants = require('../resources/constants');
 
 module.exports.addNewCafe = (name,createdby, modifiedby) => { return new Promise(
       function (resolve, reject) {
-      dbConnection.query(
+      connPool.query(
           constants.SQL.ADD_NEW_CAFE, [name,createdby, modifiedby],
           function(err, res ) {
               if(err) {
-                console.log(err);
                 reject(err);
               }
               else resolve();
@@ -18,7 +17,7 @@ module.exports.addNewCafe = (name,createdby, modifiedby) => { return new Promise
 
 module.exports.addNewAddress = (unitNumber, streetName, suburbId) => { return new Promise(
   function (resolve, reject) {
-     dbConnection.query(
+     connPool.query(
           constants.SQL.ADD_NEW_ADDRESS, [unitNumber, streetName, suburbId],function(err, res ) {
               if(err) {
                 reject(err);
@@ -31,7 +30,7 @@ module.exports.addNewAddress = (unitNumber, streetName, suburbId) => { return ne
 
 module.exports.addNewLocation = ( longitude, latitude) => { return new Promise(
     function (resolve, reject) {
-      dbConnection.query(
+      connPool.query(
           constants.SQL.ADD_NEW_LOCATION, [longitude, latitude],function(err, res ) {
               if(err) {
                 reject(err);
@@ -44,7 +43,7 @@ module.exports.addNewLocation = ( longitude, latitude) => { return new Promise(
 
 module.exports.getCafeList = () => {
   return new Promise(function (resolve, reject) {
-      dbConnection.query(
+      connPool.query(
           constants.SQL.GET_ALL_CAFES, function(err, res ) {
               if(err) {
                 reject(err);
