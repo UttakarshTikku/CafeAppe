@@ -29,8 +29,16 @@ $(document).ready(function(){
                 + '<td>' + rowData.address +'</td>'
                 '</tr></table>';
     },
-    onClickRow: function(rowIndex, rowData){
-      window.location.href = '/cafeAdmin?cafeId='+rowData.cafeid;
+    onDblClickRow: function(rowIndex, rowData){
+      $('#dd').dialog({
+        title: 'My Dialog',
+        width: 400,
+        height: 200,
+        closed: false,
+        cache: false,
+        modal: true
+      });
+      $('#dd').dialog('refresh', );
     }
   });
 });
@@ -40,6 +48,9 @@ $(document).ready(function(){
 
 <h1>List of Cafes</h1>
 <table id="tt"></table>
+
+<div id="dd" class="easyui-dialog" title="My Dialog" style="width:400px;height:200px;"
+        data-options="iconCls:'icon-save',resizable:true,modal:true" closed=true></div>
 
 <p><a href = "/addProduct">Add new Product</a></p>
 
