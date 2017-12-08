@@ -1,15 +1,30 @@
-const pg = require('pg');
-var constants = require('../resources/constants');
+// const pg = require('pg');
+var Pool = require('pg-pool');
 
-const connectionString = process.env.DATABASE_URL || constants.SQL.DATASOURCE;
+// var constants = require('../resources/constants');
 
-var dbConnection = new pg.Client({
+var connPool = new Pool({
   host: '127.0.0.1',
   port: 5432,
   database: 'postgres',
   user: 'dev',
-  password: 'dev'
+  password: 'dev',
+  max: 20,
+  min: 4
 });
-dbConnection.connect();
 
-module.exports = dbConnection;
+
+// const connectionString = process.env.DATABASE_URL || constants.SQL.DATASOURCE;
+
+// var dbConnection = new pg.Client({
+//   host: '127.0.0.1',
+//   port: 5432,
+//   database: 'postgres',
+//   user: 'dev',
+//   password: 'dev'
+// });
+// dbConnection.connect();
+
+// module.exports = dbConnection;
+
+module.exports = connPool;
