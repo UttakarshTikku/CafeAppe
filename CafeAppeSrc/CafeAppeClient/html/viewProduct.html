@@ -33,25 +33,76 @@
                         + '<td>' + rowData.productPrice +'</td>'
                     '</tr></table>';
                 },
-                onDblClickCell: function(index,field,value){
+                onDblClickRow: function(index,row) {
 
-                       window.location.href = '/getSelectedProduct?id='+value
-                    //alert('Cell clicked' + value);
+                    $('#ff').form('load',{
+                        pName:row.productname,
+                        pDesc:'dascdc',
+                        pSize:row.productsize,
+                        pPrice:row.productprice,
+                        productId: row.productid
+                    });
+
+                       /*window.location.href = '/getSelectedProduct?id='+value*/
+                    /*$('#win').window({
+                        width:600,
+                        height:400,
+                        modal:true
+
+                    });*/
+
+                    $('#win').window('open');
                 }
             });
+
+            $(".icon-edit").click(function(){
+                $('#pSubmit').show();
+                $('#pReset').show();
+                $('#pName').attr('readOnly', false);
+                $('#pDesc').attr('readOnly', false);
+                $('#pPrice').attr('readOnly', false);
+                $('#pSize').attr('readOnly', false);
+            });
         });
-
-
-
     </script>
 </head>
 <body>
 
 <h1>List of Products</h1>
 <table id="vp"></table>
+<div id="win" class="easyui-window" title="Login" style="width:300px;height:180px;" data-options="tools:'#tt'" closed="true">
+    <form id = "ff" method="post" action ="/UpdateProductSubmit">
+        <table>
+            <tr>
+                <td>Product Name</td>
+                <td><input type= "text" id="pName" name="pName" placeholder="Enter product name" readonly></td>
+            </tr>
+            <tr>
+                <td>Product Description</td>
+                <td><textarea  id="pDesc"  name="pDesc" placeholder="Product Description" readonly></textarea></td>
+            </tr>
+            <tr>
+                <td>Product Size</td>
+                <td><input type= "text" id="pSize" name="pSize" placeholder="Enter product size" readonly></td>
+            </tr>
+            <tr>
+                <td>Product Price</td>
+                <td><input type= "text" id="pPrice" name="pPrice" placeholder="Enter product Price" readonly></td>
+            </tr>
+            <tr>
+                <td><input type="submit" id="pSubmit" name="pSubmit" name="Update" hidden></td>
+                <td><input type="reset" id="pReset" name="pReset" name="Reset" hidden></td>
+            </tr>
+        </table>
+        <input type="hidden" name="productId">
+    </form>
+</div>
 
+<div id="tt">
+    <a href="javascript:void(0)" class="icon-edit" onclick=""></a>
+    <a href="javascript:void(0)" class="icon-cut" onclick=""></a>
+</div>
 <p><a href = "/addProduct">Add new Product</a></p>
-
 <p><a href = "/archivedCafe">View Archived Cafes...</a></p>
 </body>
 </html>

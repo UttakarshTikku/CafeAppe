@@ -84,3 +84,17 @@ module.exports.getProduct = function(id) {
     });
 
 }
+
+module.exports.updateProductPromise = function (cafeId, pName,modifiedDateTime, modifiedBy){
+
+    console.log(constants.SQL.UPDATE_PRODUCT);
+    console.log(cafeId + pName + modifiedDateTime + modifiedBy);
+    return new Promise(function (resolve, reject) {
+        dbConnection.query(
+            constants.SQL.UPDATE_PRODUCT, [cafeId, pName, modifiedDateTime, modifiedBy], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};

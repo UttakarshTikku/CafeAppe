@@ -11,5 +11,6 @@ module.exports.SQL = Object.freeze({
     ADD_NEW_LOCATION: "insert into CafeAppe.location values ((select nextval('cafeappe.SEQ_LOCATION_ID')), $1, $2)",
     GET_ALL_SUBURBS_FOR_STATE: 'select suburbid, suburbname from cafeappe.suburb where postcodeid in (select postcodeid from cafeappe.postcode p inner join cafeappe.state s on s.stateid = p.stateid and s.stateid = ($1) )',
     GET_ALL_CAFES: 'select c.cafeid, c.name as cafename, a.unitNumber, a.streetName, p.stateId from cafeappe.cafe c inner join cafeappe.address a on c.addressId = a.addressId inner join cafeappe.suburb s on a.suburbid = s.suburbid inner join cafeappe.postcode p on s.postcodeid = p.postcodeid',
-    GET_PRODUCT: 'select p.productname, ps.productsizeid, ps.price from CafeAppe.product p, CafeAppe.productsize ps where p.productid = ps.productid and p.productid = ($1)'
+    GET_PRODUCT: 'select p.productname, ps.productsizeid, ps.price from CafeAppe.product p, CafeAppe.productsize ps where p.productid = ps.productid and p.productid = ($1)',
+    UPDATE_PRODUCT: "update CafeAppe.product set productname = ($2), modifieddatetime = ($3), modifiedby = ($4) where productid = ($1) "
 })
