@@ -43,7 +43,7 @@ module.exports.createProductSizePromise = function (productId, productsizeid, pr
 
 module.exports.viewProduct = function() {
     return new Promise( function (resolve, reject) {
-        dbConnection.query(
+        connPool.query(
             constants.SQL.VIEW_PRODUCT, function (err, res) {
                 if (err) {
                     console.log(err);
@@ -90,7 +90,7 @@ module.exports.updateProductPromise = function (cafeId, pName,modifiedDateTime, 
     console.log(constants.SQL.UPDATE_PRODUCT);
     console.log(cafeId + pName + modifiedDateTime + modifiedBy);
     return new Promise(function (resolve, reject) {
-        dbConnection.query(
+        connPool.query(
             constants.SQL.UPDATE_PRODUCT, [cafeId, pName, modifiedDateTime, modifiedBy], function(err, res ) {
                 if(err) {
                     reject(err);

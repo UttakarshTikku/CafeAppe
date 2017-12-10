@@ -117,6 +117,7 @@ app.post('/getSuburbList', function (req, res) {
   });
 });
 
+
 app.get('/cafeAdmin', function (req, res) {
     console.log(req.query.cafeId);
     res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH));
@@ -161,26 +162,6 @@ app.get('/getProductSelected', function(req, res) {
         console.log(error);
     });
 });
-
-
-app.post('/UpdateProductSubmit', function(req, res) {
-    utils.persistenceServiceCallWithParams(querystring.stringify({
-        pName: req.body.pName,
-        pDesc: req.body.pDesc,
-        pSize: req.body.pSize,
-        pPrice: req.body.pPrice,
-        pId: req.body.productId
-    }),'/updateProductSubmits').then(function(fulfilled){
-        console.log(fulfilled);
-        res.writeHead(302,{
-            'Location': '/viewProduct'
-        });
-        res.end();
-    }).catch(function(error){
-        console.log(error);
-    });
-});
-
 
 var server = app.listen(63342, function () {
     console.log('Node server is running..');
