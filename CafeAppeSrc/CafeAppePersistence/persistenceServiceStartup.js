@@ -115,6 +115,27 @@ app.post('/updateProductSubmits', function (req, res){
     return a();
 });
 
+
+app.post('/archiveProduct', function (req, res){
+    console.log(req.body.pId);
+    var a = function() {
+        productDAO.archiveProduct(req.body.pId)
+            .then(function (fulfilled) {
+                //return res.send(fulfilled);
+            })/*.then(productDAO.createProductSizePromise(1,1, req.body.pPrice , 1.12, true, 1, new Date(), new Date(), 1).then(
+            function (fulfilled) {
+                return res.send(fulfilled);
+            })*/.catch(function (error) {
+            console.log(error);
+        })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    return a();
+});
+
+
 var server = app.listen(5001, function () {
     console.log('Node server is running..');
 });
