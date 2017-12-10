@@ -58,10 +58,10 @@ app.post('/getCafeList', function (req, res) {
 
 app.post('/addProductSubmit', function(req, res) {
       utils.persistenceServiceCallWithParams(querystring.stringify({
-          pName: req.body.pName,
-          pDesc: req.body.pDesc,
-          pSize: req.body.pSize,
-          pPrice: req.body.pPrice
+          pName: req.body.pNewName,
+          pDesc: req.body.pNewDesc,
+          pSize: req.body.pNewSize,
+          pPrice: req.body.pNewPrice
       }),'/addProductSubmits').then(function(fulfilled){
             res.writeHead(302,{
              'Location': '/viewProduct'
@@ -165,13 +165,28 @@ app.get('/getProductSelected', function(req, res) {
 
 app.post('/UpdateProductSubmit', function(req, res) {
     utils.persistenceServiceCallWithParams(querystring.stringify({
-        pName: req.body.pName,
-        pDesc: req.body.pDesc,
-        pSize: req.body.pSize,
-        pPrice: req.body.pPrice,
+        pName: req.body.pUpdateName,
+        pDesc: req.body.pUpdateDesc,
+        pSize: req.body.pUpdateSize,
+        pPrice: req.body.pUpdatePrice,
         pId: req.body.productId
     }),'/updateProductSubmits').then(function(fulfilled){
         console.log(fulfilled);
+        res.writeHead(302,{
+            'Location': '/viewProduct'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/getProductToArchive', function(req, res) {
+    console.log(req.query.id);
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        pId: req.query.id
+    }),'/archiveProduct').then(function(fulfilled){
         res.writeHead(302,{
             'Location': '/viewProduct'
         });

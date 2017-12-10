@@ -10,7 +10,17 @@
     <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
 
     <script>
+
+        var toolbar = [{
+            text:'Add',
+            iconCls:'icon-add',
+            handler:function(){
+                $('#newWin').window('open');
+            }
+        }]
+
         $(document).ready(function(){
+
             $('#vp').datagrid({
                 width:1000,
                 height:250,
@@ -35,73 +45,119 @@
                 },
                 onDblClickRow: function(index,row) {
 
-                    $('#ff').form('load',{
-                        pName:row.productname,
-                        pDesc:'dascdc',
-                        pSize:row.productsize,
-                        pPrice:row.productprice,
+                    $('#pUpdateSubmit').hide();
+                    $('#pUpdateReset').hide();
+                    $('#pUpdateName').attr('readOnly', true);
+                    $('#pUpdateDesc').attr('readOnly', true);
+                    $('#pUpdatePrice').attr('readOnly', true);
+                    $('#pUpdateSize').attr('readOnly', true);
+
+                    $('#updateWin').window({
+                        width:300,
+                        height:200,
+                        modal:true,
+                        title:row.productname,
+                        collapsible:false,
+                        minimizable:false,
+                        maximizable:false,
+                        closed:false,
+                        tools:[{
+                            iconCls:'icon-edit',
+                            handler:function(){
+                                $('#pUpdateSubmit').show();
+                                $('#pUpdateReset').show();
+                                $('#pUpdateName').attr('readOnly', false);
+                                $('#pUpdateDesc').attr('readOnly', false);
+                                $('#pUpdatePrice').attr('readOnly', false);
+                                $('#pUpdateSize').attr('readOnly', false);
+                            }
+                        },{
+                            iconCls:'icon-remove',
+                            handler:function(){
+                                $.messager.confirm('Confirm','Are you sure you want to delete record?',function(r){
+                                    if (r){
+                                        window.location.href ='/getProductToArchive?id='+ document.getElementById('hiddenUpdateId').value;
+                                    }
+                                });
+                            }
+                        }]
+                    });
+
+                    $('#updateff').form('load',{
+                        pUpdateName:row.productname,
+                        pUpdateDesc:'dascdc',
+                        pUpdateSize:row.productsize,
+                        pUpdatePrice:row.productprice,
                         productId: row.productid
                     });
 
-                       /*window.location.href = '/getSelectedProduct?id='+value*/
-                    /*$('#win').window({
-                        width:600,
-                        height:400,
-                        modal:true
-
-                    });*/
-
-                    $('#win').window('open');
                 }
             });
 
-            $(".icon-edit").click(function(){
-                $('#pSubmit').show();
-                $('#pReset').show();
-                $('#pName').attr('readOnly', false);
-                $('#pDesc').attr('readOnly', false);
-                $('#pPrice').attr('readOnly', false);
-                $('#pSize').attr('readOnly', false);
-            });
         });
     </script>
 </head>
 <body>
 
 <h1>List of Products</h1>
-<table id="vp"></table>
-<div id="win" class="easyui-window" title="Login" style="width:300px;height:180px;" data-options="tools:'#tt'" closed="true">
-    <form id = "ff" method="post" action ="/UpdateProductSubmit">
+<table id="vp" data-options="toolbar:toolbar"></table>
+
+<div id="updateWin" class="easyui-window" closed="true">
+    <form id = "updateff" method="post" action ="/UpdateProductSubmit">
         <table>
             <tr>
                 <td>Product Name</td>
-                <td><input type= "text" id="pName" name="pName" placeholder="Enter product name" readonly></td>
+                <td><input type= "text" id="pUpdateName" name="pUpdateName" placeholder="Enter product name"></td>
             </tr>
             <tr>
                 <td>Product Description</td>
-                <td><textarea  id="pDesc"  name="pDesc" placeholder="Product Description" readonly></textarea></td>
+                <td><textarea  id="pUpdateDesc"  name="pUpdateDesc" placeholder="Product Description"></textarea></td>
             </tr>
             <tr>
                 <td>Product Size</td>
-                <td><input type= "text" id="pSize" name="pSize" placeholder="Enter product size" readonly></td>
+                <td><input type= "text" id="pUpdateSize" name="pUpdateSize" placeholder="Enter product size"></td>
             </tr>
             <tr>
                 <td>Product Price</td>
-                <td><input type= "text" id="pPrice" name="pPrice" placeholder="Enter product Price" readonly></td>
+                <td><input type= "text" id="pUpdatePrice" name="pUpdatePrice" placeholder="Enter product Price"></td>
             </tr>
             <tr>
-                <td><input type="submit" id="pSubmit" name="pSubmit" name="Update" hidden></td>
-                <td><input type="reset" id="pReset" name="pReset" name="Reset" hidden></td>
+                <td><input type="submit" id="pUpdateSubmit" name="pUpdateSubmit" name="Update" ></td>
+                <td><input type="reset" id="pUpdateReset" name="pUpdateReset" name="Reset"></td>
             </tr>
         </table>
-        <input type="hidden" name="productId">
+        <input type="hidden" name="productId" id="hiddenUpdateId">
     </form>
 </div>
 
-<div id="tt">
-    <a href="javascript:void(0)" class="icon-edit" onclick=""></a>
-    <a href="javascript:void(0)" class="icon-cut" onclick=""></a>
+<div id="newWin" class="easyui-window" title="Login" style="width:300px;height:180px;" closed="true">
+    <form id = "newff" method="post" action ="/addProductSubmit">
+        <table>
+            <tr>
+                <td>Product Name</td>
+                <td><input type= "text" id="pNewName" name="pNewName" placeholder="Enter product name" ></td>
+            </tr>
+            <tr>
+                <td>Product Description</td>
+                <td><textarea  id="pNewDesc"  name="pNewDesc" placeholder="Product Description" ></textarea></td>
+            </tr>
+            <tr>
+                <td>Product Size</td>
+                <td><input type= "text" id="pNewSize" name="pNewSize" placeholder="Enter product size" ></td>
+            </tr>
+            <tr>
+                <td>Product Price</td>
+                <td><input type= "text" id="pNewPrice" name="pNewPrice" placeholder="Enter product Price" ></td>
+            </tr>
+            <tr>
+                <td><input type="submit" id="pNewSubmit" name="pNewSubmit" name="Submit" ></td>
+                <td><input type="reset" id="pNewReset" name="pNewSubmit" name="Reset"></td>
+            </tr>
+        </table>
+    </form>
 </div>
+
+
 <p><a href = "/addProduct">Add new Product</a></p>
 <p><a href = "/archivedCafe">View Archived Cafes...</a></p>
 </body>

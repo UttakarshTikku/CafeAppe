@@ -43,7 +43,7 @@ module.exports.createProductSizePromise = function (productId, productsizeid, pr
 
 module.exports.viewProduct = function() {
     return new Promise( function (resolve, reject) {
-        dbConnection.query(
+        connPool.query(
             constants.SQL.VIEW_PRODUCT, function (err, res) {
                 if (err) {
                     console.log(err);
@@ -70,7 +70,7 @@ module.exports.viewProductById = function(id){
 
 module.exports.getProduct = function(id) {
     return new Promise( function (resolve, reject) {
-        dbConnection.query(
+        connPool.query(
             constants.SQL.GET_PRODUCT, [id],function (err, res) {
                 if (err) {
                     console.log(err);
@@ -90,8 +90,23 @@ module.exports.updateProductPromise = function (cafeId, pName,modifiedDateTime, 
     console.log(constants.SQL.UPDATE_PRODUCT);
     console.log(cafeId + pName + modifiedDateTime + modifiedBy);
     return new Promise(function (resolve, reject) {
-        dbConnection.query(
+        connPool.query(
             constants.SQL.UPDATE_PRODUCT, [cafeId, pName, modifiedDateTime, modifiedBy], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};
+
+
+module.exports.archiveProduct = function (productId){
+
+    console.log(constants.SQL.ARCHIVE_PRODUCT);
+    //console.log(cafeId + pName + modifiedDateTime + modifiedBy);
+    return new Promise(function (resolve, reject) {
+        connPool.query(
+            constants.SQL.ARCHIVE_PRODUCT, [productId], function(err, res ) {
                 if(err) {
                     reject(err);
                 }
