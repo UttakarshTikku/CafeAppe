@@ -120,6 +120,7 @@ app.post('/getSuburbList', function (req, res) {
   });
 });
 
+
 app.get('/cafeAdmin', function (req, res) {
     console.log(req.query.cafeId);
     res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.CAFE_ADMIN_PATH));

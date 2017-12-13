@@ -10,6 +10,22 @@
     <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
 
 <script>
+
+var toolbar = [{
+          text:'Add',
+          iconCls:'icon-add',
+          handler:function(){
+            $('#win').dialog({
+              title: "Add Cafe",
+              width: '300px',
+              height: '310px',
+              closed: false,
+              cache: false,
+              modal: true
+              });
+          }
+}];
+
 $(document).ready(function(){
   $('#tt').datagrid({
     width:1000,
@@ -30,27 +46,156 @@ $(document).ready(function(){
                 '</tr></table>';
     },
     onDblClickRow: function(rowIndex, rowData){
-      $('#dd').dialog({
-        title: 'My Dialog',
+      $('#dd').window({
+        title: rowData.cafename,
         width: 400,
         height: 200,
         closed: false,
         cache: false,
-        modal: true
+        modal: true,
+        collapsible:false,
+        minimizable:false,
+        maximizable:false
       });
-      $('#dd').dialog('refresh', );
+      $('#cafe_stateid').combobox('readonly', true);
+      $('#updateCafeButton').attr('hidden', true);
+      $('#deleteCafeButton').attr('hidden', true);
+      var addressParts = rowData.address.split(",");
+      $('#cafeDetails').form('load',{
+          cafe_name: rowData.cafename,
+          cafe_unitnumber: addressParts[0].trim(),
+          cafe_streetname:addressParts[1].trim(),
+          cafe_stateid:addressParts[2].trim(),
+          cafe_manage_url: '/manageCafe?cafeId='+rowData.cafeid,
+          cafe_archive_url: '/archiveCafe?cafeId='+rowData.cafeid,
+          cafe_menu_view_url: '/viewCafeMenu?cafeId='+rowData.cafeid
+      });
+      $('#cafe_name,#cafe_unitnumber,#cafe_streetname,#cafe_stateid').attr('readOnly',true);
     }
   });
+
+  $('#state,#cafe_stateid').combobox({
+    url: '/getStatesList',
+    valueField: 'id',
+    textField: 'text',
+    onSelect: function(rec){
+      var url= '/getSuburbList?stateId='+rec.id;
+      $('#suburb').combobox("reload", url);
+    }
+  });
+  $('#suburb').combobox({
+    valueField: 'id',
+    textField: 'text',
+    onSelect: function(rec){
+      var url= '/getPincodeForSuburb?suburbId='+rec.id;
+      $('#postcode').combobox("reload", url);
+    }
+  });
+
 });
+
+function editCafeInformation(){
+  $('#cafe_name,#cafe_unitnumber,#cafe_streetname,#cafe_stateid').attr('readOnly',false);
+  $('#cafe_stateid').combobox('readonly', false);
+  $('#updateCafeButton').attr('hidden', false);
+  $('#deleteCafeButton').attr('hidden', true);
+}
+
+function archiveCafeInformation(){
+  $('#cafe_name,#cafe_unitnumber,#cafe_streetname,#cafe_stateid').attr('readOnly',true);
+  $('#cafe_stateid').combobox('readonly', true);
+  $('#updateCafeButton').attr('hidden', true);
+  $('#deleteCafeButton').attr('hidden', false);
+}
+
 </script>
+
 </head>
 <body>
 
 <h1>List of Cafes</h1>
-<table id="tt"></table>
+<table id="tt" data-options="toolbar:toolbar"></table>
 
-<div id="dd" class="easyui-dialog" title="My Dialog" style="width:400px;height:200px;"
-        data-options="iconCls:'icon-save',resizable:true,modal:true" closed=true></div>
+<div id="dd" class="easyui-window" style="width:400px;height:200px;"
+        data-options="tools:'#tools',resizable:false,modal:true" closed=true>
+        <form id = "cafeDetails" method="post" action ="/updateCafeDetails">
+          <table>
+            <tr><td>
+
+            Cafe name:
+              <input type= "text" id="cafe_name" name="cafe_name"  />
+            </td></tr>
+
+              <tr><td>
+            Address:
+            <table>
+            <tr>
+              <td>Unit Number:</td>
+              <td><input type= "text" id="cafe_unitnumber" name="cafe_unitnumber"  ></td>
+            </tr>
+            <tr>
+              <td>Street Name:</td>
+              <td><input type= "text" id="cafe_streetname" name="cafe_streetname"  ></td>
+            </tr>
+            <tr>
+              <td>State:</td>
+              <td>
+                <input id="cafe_stateid" name="cafe_stateid" class="easyui-combobox" data-options="valueField:'id',textField:'text' "  />
+              </td>
+            </tr>
+          </table>
+          </td></tr>
+        </table>
+        <input id = "updateCafeButton" type = "submit" value="Update"/>
+        <input id = "deleteCafeButton" type = "submit" value="Delete"/>
+        </form>
+      </div>
+
+      <div id="win" class="easyui-window" title="Add New Cafe" style="width:1000px;height:800px;" closed="true">
+              <h1>Add Cafe</h1>
+              <form style="margin-left: auto; margin-right: auto; padding: 10px" action = "/addCafeSubmit" method="post">
+                <table>
+                  <tr>
+                    <td>Cafe name</td>
+                    <td><input name="cafeName" type="text" placeholder="Cafe Name Here"/></td>
+                  </tr>
+                </table>
+                  Address:
+                <table>
+                  <tr>
+                    <td>Unit Number</td>
+                    <td><input name="unitNumber" type="text" placeholder="Unit Number Here"/></td>
+                  </tr>
+                  <tr>
+                    <td>Street Name</td>
+                    <td><input name="streetName" type="text" placeholder="Street Name Here"/></td>
+                  </tr>
+                  <tr>
+                    <td>State</td>
+                    <td>
+                      <input id="state" name="state" class="easyui-combobox" data-options="valueField:'id',textField:'text'"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Suburb</td>
+                    <td>
+                      <input id="suburb" name="suburb" class="easyui-combobox" data-options="valueField:'id',textField:'text'"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Postcode</td>
+                    <td><input id= "postcode" name="postcode" class="easyui-combobox" type="text" readonly placeholder="Your postcode" data-options="valueField:'id',textField:'text'"/></td>
+                  </tr>
+
+                </table>
+                <input type = "submit" value="Add"/>
+              </form>
+            </div>
+
+            <div id="tools">
+                <a class="icon-edit" onclick="editCafeInformation()"></a>
+                <a class="icon-remove" onclick="archiveCafeInformation()"></a>
+            </div>
 
 <p><a href = "/addProduct">Add new Product</a></p>
 
