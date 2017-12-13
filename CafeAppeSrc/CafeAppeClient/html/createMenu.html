@@ -18,6 +18,20 @@
     </style>
 
     <script>
+
+        var removeIndex = undefined;
+
+        var toolbar = [{
+            text:'Delete',
+            iconCls:'icon-remove',
+            handler:function(){
+                if(removeIndex == undefined)
+                    return;
+                else
+                    $('#vp1').datagrid('deleteRow', removeIndex);
+            }
+        }];
+
         function addProduct(){
             var dg = $('#vp');
             var data = dg.datagrid('getSelected');
@@ -73,9 +87,11 @@
             });
 
             var data = $.getJSON('/getMenuList', function(abc) {
-                alert(JSON.stringify(abc));
                 $('#vp1').datagrid({
-                    data: abc
+                    data: abc,
+                    onClickRow: function (index, row) {
+                        removeIndex = index;
+                    }
                 });
             });
 
@@ -94,7 +110,7 @@
             <table id="vp" data-options="singleSelect:true"></table>
         </div>
         <div data-options="region:'east'" style="width:600px;padding:10px">
-            <table id="vp1" class="easyui-datagrid" style="width:400px;height:250px" data-options="fitColumns:true,singleSelect:true">
+            <table id="vp1" class="easyui-datagrid" style="width:400px;height:250px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar">
                 <thead>
                 <tr>
                     <th data-options="field:'productname',width:100">Code</th>
