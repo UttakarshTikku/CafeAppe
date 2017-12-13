@@ -50,10 +50,10 @@ app.post('/addProductSubmits', function (req, res){
     console.log(req.body.pName);
     console.log(req.body.pName + req.body.pDesc + req.body.pPrice + req.body.pSize);
     var a = function() {
-        productDAO.createProductPromise(1, req.body.pName, true, 1, new Date(), new Date(), 1)
+        productDAO.createProductPromise(1, req.body.pName, true, 1, new Date(), new Date(), 1, req.body.pDesc)
             .then(function (fulfilled) {
                 //return res.send(fulfilled);
-            }).then(productDAO.createProductSizePromise(1,1, req.body.pPrice , 1.12, true, 1, new Date(), new Date(), 1).then(
+            }).then(productDAO.createProductSizePromise(1,1, req.body.pPrice , 1.12, true, 1, new Date(), new Date(), 1, req.body.pSize).then(
             function (fulfilled) {
                 return res.send(fulfilled);
             }).catch(function (error) {
@@ -98,19 +98,17 @@ app.post('/updateProductSubmits', function (req, res){
     console.log(req.body.pName);
     console.log(req.body.pName + req.body.pDesc + req.body.pPrice + req.body.pSize);
     var a = function() {
-        productDAO.updateProductPromise(req.body.pId, req.body.pName, new Date(), 1)
+        productDAO.updateProductPromise(req.body.pId, req.body.pName, new Date(), 1, req.body.pDesc)
             .then(function (fulfilled) {
-                console.log(fulfilled);
-                return res.send(fulfilled);
-            })/*.then(productDAO.updateProductSizePromise(req.body.productid,1, req.body.pPrice , new Date(), 1).then(
+            }).then(productDAO.updateProductSizePromise(req.body.pId,req.body.pSizeId, req.body.pPrice , new Date(), 1, req.body.pSize).then(
             function (fulfilled) {
                 return res.send(fulfilled);
-            })*/.catch(function (error) {
+            }).catch(function (error) {
             console.log(error);
         })
             .catch(function (error) {
                 console.log(error);
-            });
+            }));
     }
     return a();
 });
@@ -121,13 +119,26 @@ app.post('/archiveProduct', function (req, res){
     var a = function() {
         productDAO.archiveProduct(req.body.pId)
             .then(function (fulfilled) {
-                //return res.send(fulfilled);
-            })/*.then(productDAO.createProductSizePromise(1,1, req.body.pPrice , 1.12, true, 1, new Date(), new Date(), 1).then(
+            }).then(productDAO.archiveProductSize(req.body.pId, req.body.pSizeId).then(
             function (fulfilled) {
                 return res.send(fulfilled);
-            })*/.catch(function (error) {
+            }).catch(function (error) {
             console.log(error);
         })
+            .catch(function (error) {
+                console.log(error);
+            }));
+    }
+    return a();
+});
+
+
+app.post('/createMenuSubmit', function (req, res){
+    var a = function() {
+        productDAO.createMenuPromise(1, req.body.pName, req.body.pDesc, req.body.pSize, req.body.pPrice)
+            .then(function (fulfilled) {
+                return res.send(fulfilled);
+            })
             .catch(function (error) {
                 console.log(error);
             });
@@ -135,6 +146,18 @@ app.post('/archiveProduct', function (req, res){
     return a();
 });
 
+
+app.post('/viewMenu', function (req, res){
+    var a = function(){
+        productDAO.viewMenu().then(function(fulfilled){
+            //console.log(fulfilled);
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
 
 var server = app.listen(5001, function () {
     console.log('Node server is running..');

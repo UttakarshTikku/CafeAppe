@@ -77,7 +77,10 @@ app.post('/getProductList', function (req, res) {
             var result = [];
             for(var k in JSON.parse(fulfilled).rows) {
                 var temp = JSON.parse(fulfilled).rows[k];
-                result.push({productid:temp.productid, productname:temp.productname, productsize:temp.productsizeid, productprice:temp.price});
+                result.push({productid:temp.productid,
+                    productname:temp.productname, productsize:temp.size,
+                    productprice:temp.price, productsizeid:temp.productsizeid,
+                    productdescription:temp.description});
             }
             res.contentType('application/json');
             res.send(JSON.stringify(result));
@@ -140,6 +143,13 @@ app.get('/getSelectedProduct', function(req, res) {
     res.sendFile(constants.PATH.PROJECT_PATH + constants.PATH.MANAGE_PRODUCT_PATH);
 });
 
+app.get('/Menu', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.MENU_PATH));
+});
+
+app.get('/openMenu', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.OPEN_MENU_PATH));
+});
 
 app.get('/getProductSelected', function(req, res) {
 
@@ -169,7 +179,8 @@ app.post('/UpdateProductSubmit', function(req, res) {
         pDesc: req.body.pUpdateDesc,
         pSize: req.body.pUpdateSize,
         pPrice: req.body.pUpdatePrice,
-        pId: req.body.productId
+        pId: req.body.productId,
+        pSizeId: req.body.hiddenUpdateProductSizeId
     }),'/updateProductSubmits').then(function(fulfilled){
         console.log(fulfilled);
         res.writeHead(302,{
@@ -184,8 +195,10 @@ app.post('/UpdateProductSubmit', function(req, res) {
 
 app.get('/getProductToArchive', function(req, res) {
     console.log(req.query.id);
+
     utils.persistenceServiceCallWithParams(querystring.stringify({
-        pId: req.query.id
+        pId: req.query.id,
+        pSizeId: req.query.sizeid
     }),'/archiveProduct').then(function(fulfilled){
         res.writeHead(302,{
             'Location': '/viewProduct'
@@ -196,6 +209,69 @@ app.get('/getProductToArchive', function(req, res) {
     });
 });
 
+
+app.post('/createMenu', function(req, res) {
+    console.log('In menu option');
+    var dataToBeInserted = JSON.parse(req.body.menu);
+    console.log(dataToBeInserted);
+
+    for(var k in dataToBeInserted.rows){
+        console.log(dataToBeInserted.rows[k]);
+        utils.persistenceServiceCallWithParams(querystring.stringify({
+            pName: dataToBeInserted.rows[k].productname1,
+            pDesc: dataToBeInserted.rows[k].productdescription1,
+            pSize: dataToBeInserted.rows[k].productsize1,
+            pPrice: dataToBeInserted.rows[k].productprice1,
+        }),'/createMenuSubmit').then(function(fulfilled){
+            console.log(fulfilled);
+            res.writeHead(302,{
+                'Location': '/Menu'
+            });
+            res.end();
+        }).catch(function(error){
+            console.log(error);
+        });
+    }
+});
+
+
+app.post('/getMenuList', function (req, res) {
+    utils.persistenceServiceCallSansParams('/viewMenu').then(function(fulfilled){
+        var result = [];
+        //console.log(fulfilled);
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({productname:temp.productname,
+                productdescription:temp.productdescription,
+                productsize:temp.productsize,
+                productprice:temp.productprice
+                });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+app.get('/getMenuList', function (req, res) {
+    utils.persistenceServiceCallSansParams('/viewMenu').then(function(fulfilled){
+        var result = [];
+        console.log(fulfilled);
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({productname:temp.productname,
+                productdescription:temp.productdescription,
+                productsize:temp.productsize,
+                productprice:temp.productprice
+            });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
 
 var server = app.listen(63342, function () {
     console.log('Node server is running..');

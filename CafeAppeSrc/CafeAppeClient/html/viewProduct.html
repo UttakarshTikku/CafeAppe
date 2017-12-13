@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script>src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"</script>
 
     <script>
 
@@ -20,7 +21,6 @@
         }]
 
         $(document).ready(function(){
-
             $('#vp').datagrid({
                 width:1000,
                 height:250,
@@ -32,19 +32,22 @@
                 columns:[[
                     {field:'productid',title:'Product Id',width:80},
                     {field:'productname',title:'Product Name',width:100,sortable:true},
+                    {field:'productdescription',title:'Product Description',width:100,sortable:true},
                     {field:'productsize',title:'Product Size',width:100,sortable:true},
                     {field:'productprice',title:'Product Price',width:100,sortable:true}
                 ]],
                 detailFormatter: function(rowIndex, rowData){
                     return '<table><tr>' +
-                        '<td rowspan=2 style="border:0">'+ rowData.productid +'</td>' +
+                        '<td rowspan=2 style="border:0" id = "ti">'+ rowData.productid +'</td>' +
                         '<td style="border:0">  + rowData.productname + </a> </td>'
-                        + '<td>' + rowData.productsize +'</td>'
+                        + '<td>' + rowData.description +'</td>'
+                        + '<td>' + rowData.size +'</td>'
                         + '<td>' + rowData.productPrice +'</td>'
+                        + '<td> <input type="hidden" name="productSizeId" id="hiddenProductSizeId" value=' + rowData.productsizeid + '></td>'
                     '</tr></table>';
                 },
-                onDblClickRow: function(index,row) {
 
+                onDblClickRow: function(index,row) {
                     $('#pUpdateSubmit').hide();
                     $('#pUpdateReset').hide();
                     $('#pUpdateName').attr('readOnly', true);
@@ -76,7 +79,8 @@
                             handler:function(){
                                 $.messager.confirm('Confirm','Are you sure you want to delete record?',function(r){
                                     if (r){
-                                        window.location.href ='/getProductToArchive?id='+ document.getElementById('hiddenUpdateId').value;
+                                        window.location.href ='/getProductToArchive?id='+ document.getElementById('hiddenUpdateProductId').value
+                                        + '&sizeid='+document.getElementById('hiddenUpdateProductSizeId').value;
                                     }
                                 });
                             }
@@ -85,13 +89,16 @@
 
                     $('#updateff').form('load',{
                         pUpdateName:row.productname,
-                        pUpdateDesc:'dascdc',
+                        pUpdateDesc:row.productdescription,
                         pUpdateSize:row.productsize,
                         pUpdatePrice:row.productprice,
-                        productId: row.productid
+                        productId: row.productid,
+                        hiddenUpdateProductSizeId: row.productsizeid
                     });
 
                 }
+
+
             });
 
         });
@@ -126,7 +133,8 @@
                 <td><input type="reset" id="pUpdateReset" name="pUpdateReset" name="Reset"></td>
             </tr>
         </table>
-        <input type="hidden" name="productId" id="hiddenUpdateId">
+        <input type="hidden" name="productId" id="hiddenUpdateProductId">
+        <input type="hidden" name="hiddenUpdateProductSizeId" id="hiddenUpdateProductSizeId">
     </form>
 </div>
 
@@ -160,5 +168,6 @@
 
 <p><a href = "/addProduct">Add new Product</a></p>
 <p><a href = "/archivedCafe">View Archived Cafes...</a></p>
+<p><a href = "/Menu">View Menu</a></p>
 </body>
 </html>
