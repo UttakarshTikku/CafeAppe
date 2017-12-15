@@ -19,22 +19,43 @@
 
     <script>
 
-        var removeIndex = undefined;
+        var removeIndexVP1 = undefined;
+        var removeIndexVP = undefined;
+        var rowToAddVP = undefined;
 
         var toolbar = [{
             text:'Delete',
             iconCls:'icon-remove',
-            handler:function(){
-                if(removeIndex == undefined)
+            handler:function() {
+                if (removeIndexVP1 == undefined)
                     return;
-                else
-                    $('#vp1').datagrid('deleteRow', removeIndex);
+                else {
+                    $.messager.confirm('Confirm', 'Are you sure you want to remove item from menu?', function (r) {
+                        if (r) {
+                            $('#vp1').datagrid('deleteRow', removeIndexVP1);
+                            removeIndexVP1 = undefined;
+                            if(rowToAddVP == undefined){
+                                return;
+                            }else{
+                                $('#vp').datagrid('insertRow', {
+                                    index: 0,
+                                    row:{
+                                        productname:rowToAddVP.productname,
+                                        productdescription:rowToAddVP.productdescription,
+                                        productsize:rowToAddVP.productsize,
+                                        productprice:rowToAddVP.productprice
+                                    }
+                                });
+                                rowToAddVP = undefined;
+                            }
+                        }
+                    });
+                }
             }
         }];
 
         function addProduct(){
-            var dg = $('#vp');
-            var data = dg.datagrid('getSelected');
+            var data = $('#vp').datagrid('getSelected');
             var dg1 = $('#vp1');
 
             dg1.datagrid('insertRow',{
@@ -47,6 +68,12 @@
                 }
             });
 
+            if(removeIndexVP != undefined) {
+                $('#vp').datagrid('deleteRow', removeIndexVP);
+                removeIndexVP = undefined;
+            } else{
+                return;
+            }
         }
 
 
@@ -68,6 +95,9 @@
                 nowrap:false,
                 fitColumns:true,
                 url:'/getProductList',
+                onClickRow: function (index, row) {
+                    removeIndexVP = index;
+                },
                 columns:[[
                     {field:'productname',title:'Product Name',width:50,sortable:true},
                     {field:'productdescription',title:'Product Description',width:100,sortable:true},
@@ -90,7 +120,8 @@
                 $('#vp1').datagrid({
                     data: abc,
                     onClickRow: function (index, row) {
-                        removeIndex = index;
+                        removeIndexVP1 = index;
+                        rowToAddVP = row;
                     }
                 });
             });

@@ -16,6 +16,7 @@ module.exports.SQL = Object.freeze({
     UPDATE_PRODUCT_SIZE: "update CafeAppe.productsize set price = ($3), modifieddatetime = ($4), modifiedby = ($5), size = ($6) where productid = ($1) and productsizeid = ($2)",
     ARCHIVE_PRODUCT: "update CafeAppe.product set activeflag = false, modifieddatetime = now() where productid = ($1) ",
     ARCHIVE_PRODUCT_SIZE: "update CafeAppe.productsize set activeflag = false, modifieddatetime = now() where productid = ($1) and productsizeid = ($2)",
+    DELETE_MENU: "delete from CafeAppe.menu where cafeId = ($1)",
     CREATE_MENU:"insert into CafeAppe.menu values($1, $2, $3, $4, $5)",
     VIEW_MENU: 'select productname, productdescription, productsize, productprice from CafeAppe.menu where cafeid = 1'
 })

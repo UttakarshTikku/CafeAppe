@@ -133,6 +133,19 @@ app.post('/archiveProduct', function (req, res){
 });
 
 
+app.post('/deleteMenu', function (req, res){
+    console.log(req.body.cafeId);
+    var a = function() {
+        productDAO.deleteMenu(req.body.cafeId)
+            .then(function (fulfilled) {
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    return a();
+});
+
 app.post('/createMenuSubmit', function (req, res){
     var a = function() {
         productDAO.createMenuPromise(1, req.body.pName, req.body.pDesc, req.body.pSize, req.body.pPrice)

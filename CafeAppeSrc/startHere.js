@@ -214,25 +214,31 @@ app.get('/getProductToArchive', function(req, res) {
 app.post('/createMenu', function(req, res) {
     console.log('In menu option');
     var dataToBeInserted = JSON.parse(req.body.menu);
-    console.log(dataToBeInserted);
+    //console.log(dataToBeInserted);
 
-    for(var k in dataToBeInserted.rows){
-        console.log(dataToBeInserted.rows[k]);
-        utils.persistenceServiceCallWithParams(querystring.stringify({
-            pName: dataToBeInserted.rows[k].productname1,
-            pDesc: dataToBeInserted.rows[k].productdescription1,
-            pSize: dataToBeInserted.rows[k].productsize1,
-            pPrice: dataToBeInserted.rows[k].productprice1,
-        }),'/createMenuSubmit').then(function(fulfilled){
-            console.log(fulfilled);
-            res.writeHead(302,{
-                'Location': '/Menu'
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        cafeId: 1
+    }),'/deleteMenu').then(function(fulfilled){
+        for(var k in dataToBeInserted.rows){
+            console.log(dataToBeInserted.rows[k]);
+            utils.persistenceServiceCallWithParams(querystring.stringify({
+                pName: dataToBeInserted.rows[k].productname,
+                pDesc: dataToBeInserted.rows[k].productdescription,
+                pSize: dataToBeInserted.rows[k].productsize,
+                pPrice: dataToBeInserted.rows[k].productprice,
+            }),'/createMenuSubmit').then(function(fulfilled1){
+                //console.log(fulfilled1);
+                res.writeHead(302,{
+                    'Location': '/Menu'
+                });
+                res.end();
+            }).catch(function(error){
+                console.log(error);
             });
-            res.end();
-        }).catch(function(error){
-            console.log(error);
-        });
-    }
+        }
+    }).catch(function(error){
+        console.log(error);
+    });
 });
 
 

@@ -134,6 +134,20 @@ module.exports.archiveProductSize = function (productId, productSizeId){
             });
     })};
 
+
+module.exports.deleteMenu = function (cafeId){
+
+    //console.log(cafeId + pName + modifiedDateTime + modifiedBy);
+    return new Promise(function (resolve, reject) {
+        connPool.query(
+            constants.SQL.DELETE_MENU, [cafeId], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};
+
 module.exports.createMenuPromise = function (cafeId, productname,productdrescription, productsize, productprice){
 
     return new Promise(function (resolve, reject) {
