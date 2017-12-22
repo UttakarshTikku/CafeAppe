@@ -57,11 +57,13 @@ app.post('/getCafeList', function (req, res) {
 });
 
 app.post('/addProductSubmit', function(req, res) {
+
+        var PriceSize = JSON.parse(req.body.pPriceHidden);
+        console.log(PriceSize);
       utils.persistenceServiceCallWithParams(querystring.stringify({
-          pName: req.body.pNewName,
-          pDesc: req.body.pNewDesc,
-          pSize: req.body.pNewSize,
-          pPrice: req.body.pNewPrice
+          name: req.body.pName,
+          desc: req.body.pDesc,
+          priceSize: req.body.pPriceHidden
       }),'/addProductSubmits').then(function(fulfilled){
             res.writeHead(302,{
              'Location': '/viewProduct'
@@ -183,7 +185,6 @@ app.post('/UpdateProductSubmit', function(req, res) {
         pId: req.body.productId,
         pSizeId: req.body.hiddenUpdateProductSizeId
     }),'/updateProductSubmits').then(function(fulfilled){
-        console.log(fulfilled);
         res.writeHead(302,{
             'Location': '/viewProduct'
         });
@@ -212,15 +213,13 @@ app.get('/getProductToArchive', function(req, res) {
 
 
 app.post('/createMenu', function(req, res) {
-    console.log('In menu option');
     var dataToBeInserted = JSON.parse(req.body.menu);
-    //console.log(dataToBeInserted);
-
+   //console.log(combinedData);
     utils.persistenceServiceCallWithParams(querystring.stringify({
-        cafeId: 1
+        cafeId: 1,
+        userId: 1
     }),'/deleteMenu').then(function(fulfilled){
         for(var k in dataToBeInserted.rows){
-            console.log(dataToBeInserted.rows[k]);
             utils.persistenceServiceCallWithParams(querystring.stringify({
                 pName: dataToBeInserted.rows[k].productname,
                 pDesc: dataToBeInserted.rows[k].productdescription,
@@ -228,14 +227,14 @@ app.post('/createMenu', function(req, res) {
                 pPrice: dataToBeInserted.rows[k].productprice,
             }),'/createMenuSubmit').then(function(fulfilled1){
                 //console.log(fulfilled1);
-                res.writeHead(302,{
-                    'Location': '/Menu'
-                });
-                res.end();
             }).catch(function(error){
                 console.log(error);
             });
         }
+        res.writeHead(302,{
+            'Location': '/Menu'
+        });
+        res.end();
     }).catch(function(error){
         console.log(error);
     });
@@ -254,8 +253,99 @@ app.post('/getMenuList', function (req, res) {
                 productprice:temp.productprice
                 });
         }
+        var combinedData = [];
+        var data = {};
+        for(var i=0; i< result.length; i++){
+            if(combinedData.length == 0){
+                if (result[i].productsize === 'small') {
+                    combinedData.push({
+                        name: result[i].productname,
+                        desc: result[i].productdescription,
+                        priceSmall: result[i].productprice,
+                        priceMedium: 'N/A',
+                        priceLarge: 'N/A',
+                    });
+                } else if (result[i].productsize === 'medium') {
+                    combinedData.push({
+                        name: result[i].productname,
+                        desc: result[i].productdescription,
+                        priceMedium: result[i].productprice,
+                        priceSmall: 'N/A',
+                        priceLarge: 'N/A',
+                    });
+                }
+                else if (result[i].productsize === 'large') {
+                    combinedData.push({
+                        name: result[i].productname,
+                        desc: result[i].productdescription,
+                        priceLarge: result[i].productprice,
+                        priceMedium: 'N/A',
+                        priceSmall: 'N/A',
+                    });
+                }
+            } else {
+                for(var j=0; j< combinedData.length; j++){
+                    if(result[i].productname === combinedData[j].name){
+                        if (result[i].productsize === 'small') {
+                            data = {
+                                value: j,
+                                priceType : 'priceSmall',
+                                price: result[i].productprice,
+                            };
+                        } else if (result[i].productsize === 'medium') {
+                            data = {
+                                value: j,
+                                priceType: 'priceMedium',
+                                price: result[i].productprice,
+                            };
+                        }
+                        else if (result[i].productsize === 'large') {
+                            data = {
+                                value: j,
+                                priceType: 'priceLarge',
+                                price: result[i].productprice,
+                            };
+                        }
+                    }
+                }
+                if(Object.keys(data).length === 0 && data.constructor === Object){
+                    console.log('inside if statement of empty data');
+                    if (result[i].productsize === 'small' || result[i].productsize === 's') {
+                        combinedData.push({
+                            name: result[i].productname,
+                            desc: result[i].productdescription,
+                            priceSmall: result[i].productprice,
+                            priceMedium: 'N/A',
+                            priceLarge: 'N/A',
+                        });
+                    } else if (result[i].productsize === 'medium') {
+                        combinedData.push({
+                            name: result[i].productname,
+                            desc: result[i].productdescription,
+                            priceMedium: result[i].productprice,
+                            priceSmall: 'N/A',
+                            priceLarge: 'N/A',
+                        });
+                    }
+                    else if (result[i].productsize === 'large') {
+                        combinedData.push({
+                            name: result[i].productname,
+                            desc: result[i].productdescription,
+                            priceLarge: result[i].productprice,
+                            priceMedium: 'N/A',
+                            priceSmall: 'N/A',
+                        });
+                    }
+                } else{
+                    combinedData[data.value][data.priceType] = data.price;
+                    data = {};
+                }
+            }
+
+        }
+
         res.contentType('application/json');
-        res.send(JSON.stringify(result));
+        res.send(JSON.stringify(combinedData));
     }).catch(function(error){
         console.log(error);
     });
@@ -264,7 +354,6 @@ app.post('/getMenuList', function (req, res) {
 app.get('/getMenuList', function (req, res) {
     utils.persistenceServiceCallSansParams('/viewMenu').then(function(fulfilled){
         var result = [];
-        console.log(fulfilled);
         for(var k in JSON.parse(fulfilled).rows) {
             var temp = JSON.parse(fulfilled).rows[k];
             result.push({productname:temp.productname,

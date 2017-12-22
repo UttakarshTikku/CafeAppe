@@ -13,7 +13,7 @@
         $(document).ready(function(){
             $('#tt').datagrid({
                 width:1000,
-                height:250,
+                height:600,
                 remoteSort:false,
                 singleSelect:true,
                 nowrap:false,
@@ -27,17 +27,19 @@
                 }],
                 url:'/getMenuList',
                 columns:[[
-                    {field:'productname',title:'Product Name',width:100,sortable:true},
-                    {field:'productdescription',title:'Product Description',width:100,sortable:true},
-                    {field:'productsize',title:'Product Size',width:100,sortable:true},
-                    {field:'productprice',title:'ProductPrice',width:100,sortable:true},
+                    {field:'name',title:'Product Name',width:100,sortable:true},
+                    {field:'desc',title:'Product Description',width:100,sortable:true},
+                    {field:'priceSmall',title:'Price Small',width:100,sortable:true},
+                    {field:'priceMedium',title:'Price Medium',width:100,sortable:true},
+                    {field:'priceLarge',title:'Price Large',width:100,sortable:true},
                 ]],
                 detailFormatter: function(rowIndex, rowData){
                     return '<table><tr>' +
-                        '<td style="border:0">' + rowData.productname + ' </a> </td>'
-                        + '<td>' + rowData.productdescription +'</td>'
-                        + '<td>' + rowData.productsize +'</td>'
-                        + '<td>' + rowData.productprice +'</td>'
+                        '<td style="border:0">' + rowData.name + ' </a> </td>'
+                        + '<td>' + rowData.desc +'</td>'
+                        + '<td>' + rowData.priceSmall +'</td>'
+                        + '<td>' + rowData.priceMedium +'</td>'
+                        + '<td>' + rowData.priceLarge +'</td>'
                     '</tr></table>';
                 }
             });

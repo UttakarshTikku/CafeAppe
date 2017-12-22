@@ -3,6 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Product</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <script type="application/javascript">
+        $(document).ready(function() {
+            var sizeCount = 1;
+            var priceCount = 1;
+            $("#pAdd").click(function () {
+                var size = 'pSize'+sizeCount;
+                var price = 'pPrice'+priceCount;
+                //console.log(pSize);
+                $(".add").before("<tr>\n" +
+                    "            <td>Product Size</td>\n" +
+                    "            <td><input type= \"text\" id="+size+" name="+size+" placeholder=\"Enter product size\"></td>\n" +
+                    "        </tr>\n" +
+                    "        <tr>\n" +
+                    "            <td>Product Price</td>\n" +
+                    "            <td><input type= \"text\" id="+price+" name="+price+" placeholder=\"Enter product Price\"></td>\n" +
+                    "        </tr>");
+                sizeCount++;
+                priceCount++;
+            });
+
+            $("#pSubmit").click(function () {
+                var data = [];
+                for(var k=0; k<sizeCount; k++){
+                    //console.log('pSize'+k);
+                    data.push({size: document.getElementById('pSize'+k).value, price: document.getElementById('pPrice'+k).value})
+                }
+                console.log(JSON.stringify(data));
+                $("#pPriceHidden").val(JSON.stringify(data));
+                $("#pSizeHidden").val(sizeCount);
+            })
+        });
+
+
+    </script>
+
 </head>
 <body>
 
@@ -19,17 +56,23 @@
         </tr>
         <tr>
             <td>Product Size</td>
-            <td><input type= "text" id="pSize" name="pSize" placeholder="Enter product size"></td>
+            <td><input type= "text" id="pSize0" name="pSize0" placeholder="Enter product size"></td>
         </tr>
         <tr>
             <td>Product Price</td>
-            <td><input type= "text" id="pPrice" name="pPrice" placeholder="Enter product Price"></td>
+            <td><input type= "text" id="pPrice0" name="pPrice0" placeholder="Enter product Price"></td>
+        </tr>
+        <tr class = "add">
+            <td><input type= "button" id="pAdd" name="pAdd" value="Add another Size"></td>
         </tr>
         <tr>
-            <td><input type="submit" id="pSubmit" name="pSubmit" name="Submit"></td>
-            <td><input type="reset" id="pReset" name="pReset" name="Reset"></td>
+            <td><input type="submit" id="pSubmit" name="pSubmit" value="Submit"></td>
+            <td><input type="reset" id="pReset" name="pReset" value="Reset"></td>
         </tr>
     </table>
+
+    <input type="hidden" id="pPriceHidden" name="pPriceHidden">
+    <input type="hidden" id="pSizeHidden" name="pSizeHidden">
 
 </form>
 

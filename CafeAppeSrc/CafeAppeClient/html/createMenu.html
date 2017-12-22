@@ -88,8 +88,8 @@
         $(document).ready(function(){
             //alert(JSON.stringify(data));
             $('#vp').datagrid({
-                width:500,
-                height:250,
+                width:550,
+                height:600,
                 remoteSort:false,
                 singleSelect:true,
                 nowrap:false,
@@ -99,10 +99,10 @@
                     removeIndexVP = index;
                 },
                 columns:[[
-                    {field:'productname',title:'Product Name',width:50,sortable:true},
+                    {field:'productname',title:'Product Name',width:100,sortable:true},
                     {field:'productdescription',title:'Product Description',width:100,sortable:true},
-                    {field:'productsize',title:'Product Size',width:20,sortable:true},
-                    {field:'productprice',title:'Product Price',width:20,sortable:true}
+                    {field:'productsize',title:'Product Size',width:100,sortable:true},
+                    {field:'productprice',title:'Product Price',width:100,sortable:true}
                 ]],
                 detailFormatter: function(rowIndex, rowData){
                     return '<table>' +
@@ -135,19 +135,19 @@
 
 <h2>Create Menu</h2>
 <div style="margin:20px 0 10px 0;"></div>
-<div class="easyui-panel" title="Nested Panel" style="width:1300px;height:200px;padding:10px;">
+<div class="easyui-panel" style="width:1300px;height:600px;padding:10px;">
     <div class="easyui-layout" data-options="fit:true">
-        <div data-options="region:'west',split:true" style="width:600px;padding:10px">
+        <div data-options="region:'west',split:true" style="width:600px; height:600px; padding:10px">
             <table id="vp" data-options="singleSelect:true"></table>
         </div>
         <div data-options="region:'east'" style="width:600px;padding:10px">
-            <table id="vp1" class="easyui-datagrid" style="width:400px;height:250px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar">
+            <table id="vp1" class="easyui-datagrid" style="width:550px;height:600px; padding:10px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar">
                 <thead>
                 <tr>
-                    <th data-options="field:'productname',width:100">Code</th>
-                    <th data-options="field:'productdescription',width:100">Name</th>
-                    <th data-options="field:'productsize',width:100,align:'right'">Price</th>
-                    <th data-options="field:'productprice',width:100,align:'right'">Price</th>
+                    <th data-options="field:'productname',width:100">Product Name</th>
+                    <th data-options="field:'productdescription',width:100">Product Description</th>
+                    <th data-options="field:'productsize',width:100,align:'right'">Product Size</th>
+                    <th data-options="field:'productprice',width:100,align:'right'">Product Price</th>
                 </tr>
                 </thead>
             </table>

@@ -33,7 +33,9 @@ module.exports.createProductSizePromise = function (productId, productsizeid, pr
                 if(err) {
                     reject(err);
                 }
-                else resolve(res);
+                else {
+                    console.log(res);
+                    resolve(res)};
             });
     })};
 
@@ -148,11 +150,11 @@ module.exports.deleteMenu = function (cafeId){
             });
     })};
 
-module.exports.createMenuPromise = function (cafeId, productname,productdrescription, productsize, productprice){
+module.exports.createMenuPromise = function (cafeId, productname,productdrescription, productsize, productprice, createdBy, createdDatetime, modifiedBy, modifiefDatetime){
 
     return new Promise(function (resolve, reject) {
         connPool.query(
-            constants.SQL.CREATE_MENU, [cafeId, productname,productdrescription, productsize, productprice], function(err, res ) {
+            constants.SQL.CREATE_MENU, [cafeId, productname,productdrescription, productsize, productprice, createdBy, createdDatetime, modifiedBy, modifiefDatetime], function(err, res ) {
                 if(err) {
                     reject(err);
                 }

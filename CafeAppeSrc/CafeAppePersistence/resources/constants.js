@@ -1,7 +1,7 @@
 module.exports.SQL = Object.freeze({
     DATASOURCE: 'postgres://localhost:5432/akhileshlamba',
     CREATE_PRODUCT: "insert into CafeAppe.Product values ($1, (select nextval('CafeAppe.product_id_seq')), $2, $3, $4, $5, $6, $7, $8)",
-    VIEW_PRODUCT: 'select p.productid, p.productname, p.description, ps.size, ps.productsizeid, ps.price from CafeAppe.Product p , CafeAppe.productsize ps where p.productid = ps.productid and p.activeflag = true',
+    VIEW_PRODUCT: 'select p.productid, p.productname, p.description, ps.size, ps.productsizeid, ps.price from CafeAppe.Product p , CafeAppe.productsize ps where p.productid = ps.productid and p.activeflag = true and p.cafeId = 1',
     VIEW_PRODUCT_BY_ID: 'select * from CafeAppe.product where productId = ($1)',
     CREATE_PRODUCT_SIZE: "insert into CafeAppe.ProductSize values ((select currval('CafeAppe.product_id_seq')) , (select nextval('CafeAppe.productsize_id_seq')), $1, $2, $3, $4, $5, $6, $7, $8)",
     VIEW_PRODUCT_SIZE_BY_ID: 'select * from CafeAppe.productSize where productId = ($2)',
@@ -17,6 +17,6 @@ module.exports.SQL = Object.freeze({
     ARCHIVE_PRODUCT: "update CafeAppe.product set activeflag = false, modifieddatetime = now() where productid = ($1) ",
     ARCHIVE_PRODUCT_SIZE: "update CafeAppe.productsize set activeflag = false, modifieddatetime = now() where productid = ($1) and productsizeid = ($2)",
     DELETE_MENU: "delete from CafeAppe.menu where cafeId = ($1)",
-    CREATE_MENU:"insert into CafeAppe.menu values($1, $2, $3, $4, $5)",
+    CREATE_MENU:"insert into CafeAppe.menu values($1, $2, $3, $4, $5, $6, $7, $8, $9)",
     VIEW_MENU: 'select productname, productdescription, productsize, productprice from CafeAppe.menu where cafeid = 1'
 })
