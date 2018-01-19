@@ -11,12 +11,11 @@ module.exports.createProduct = function (cafeId, pName, activeFlag, createdBy , 
         });
 };
 
-module.exports.createProductPromise = function (cafeId, pName, activeFlag, createdBy , createdDateTime, modifiedDateTime, modifiedBy){
+module.exports.createProductPromise = function (cafeId, pName, activeFlag, createdBy , createdDateTime, modifiedDateTime, modifiedBy, pDesc){
 
-    console.log(constants.SQL.CREATE_PRODUCT);
     return new Promise(function (resolve, reject) {
         connPool.query(
-            constants.SQL.CREATE_PRODUCT, [cafeId, pName, activeFlag, createdBy, createdDateTime, modifiedDateTime, modifiedBy], function(err, res ) {
+            constants.SQL.CREATE_PRODUCT, [cafeId, pName, activeFlag, createdBy, createdDateTime, modifiedDateTime, modifiedBy, pDesc], function(err, res ) {
                 if(err) {
                     reject(err);
                 }
@@ -26,15 +25,17 @@ module.exports.createProductPromise = function (cafeId, pName, activeFlag, creat
 
 
 module.exports.createProductSizePromise = function (productId, productsizeid, price, tax, activeFlag, createdBy
-    , createdDateTime, modifiedDateTime, modifiedBy){
+    , createdDateTime, modifiedDateTime, modifiedBy, size){
     return new Promise(function (resolve, reject) {
         connPool.query(
             constants.SQL.CREATE_PRODUCT_SIZE, [price, tax, activeFlag, createdBy
-                , createdDateTime, modifiedDateTime, modifiedBy], function(err, res ) {
+                , createdDateTime, modifiedDateTime, modifiedBy, size], function(err, res ) {
                 if(err) {
                     reject(err);
                 }
-                else resolve(res);
+                else {
+                    console.log(res);
+                    resolve(res)};
             });
     })};
 
@@ -85,13 +86,23 @@ module.exports.getProduct = function(id) {
 
 }
 
-module.exports.updateProductPromise = function (cafeId, pName,modifiedDateTime, modifiedBy){
+module.exports.updateProductPromise = function (cafeId, pName,modifiedDateTime, modifiedBy, pDesc){
 
-    console.log(constants.SQL.UPDATE_PRODUCT);
-    console.log(cafeId + pName + modifiedDateTime + modifiedBy);
     return new Promise(function (resolve, reject) {
         connPool.query(
-            constants.SQL.UPDATE_PRODUCT, [cafeId, pName, modifiedDateTime, modifiedBy], function(err, res ) {
+            constants.SQL.UPDATE_PRODUCT, [cafeId, pName, modifiedDateTime, modifiedBy, pDesc], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};
+
+module.exports.updateProductSizePromise = function (productid, productsizeid,price, modifiedDateTime, modifiedBy, size){
+
+    return new Promise(function (resolve, reject) {
+        connPool.query(
+            constants.SQL.UPDATE_PRODUCT_SIZE, [productid, productsizeid,price, modifiedDateTime, modifiedBy, size], function(err, res ) {
                 if(err) {
                     reject(err);
                 }
@@ -102,7 +113,6 @@ module.exports.updateProductPromise = function (cafeId, pName,modifiedDateTime, 
 
 module.exports.archiveProduct = function (productId){
 
-    console.log(constants.SQL.ARCHIVE_PRODUCT);
     //console.log(cafeId + pName + modifiedDateTime + modifiedBy);
     return new Promise(function (resolve, reject) {
         connPool.query(
@@ -113,3 +123,58 @@ module.exports.archiveProduct = function (productId){
                 else resolve(res);
             });
     })};
+
+module.exports.archiveProductSize = function (productId, productSizeId){
+
+    return new Promise(function (resolve, reject) {
+        connPool.query(
+            constants.SQL.ARCHIVE_PRODUCT_SIZE, [productId, productSizeId], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};
+
+
+module.exports.deleteMenu = function (cafeId){
+
+    //console.log(cafeId + pName + modifiedDateTime + modifiedBy);
+    return new Promise(function (resolve, reject) {
+        connPool.query(
+            constants.SQL.DELETE_MENU, [cafeId], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};
+
+module.exports.createMenuPromise = function (cafeId, productname,productdrescription, productsize, productprice, createdBy, createdDatetime, modifiedBy, modifiefDatetime){
+
+    return new Promise(function (resolve, reject) {
+        connPool.query(
+            constants.SQL.CREATE_MENU, [cafeId, productname,productdrescription, productsize, productprice, createdBy, createdDatetime, modifiedBy, modifiefDatetime], function(err, res ) {
+                if(err) {
+                    reject(err);
+                }
+                else resolve(res);
+            });
+    })};
+
+module.exports.viewMenu = function() {
+    return new Promise( function (resolve, reject) {
+        connPool.query(
+            constants.SQL.VIEW_MENU, function (err, res) {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                else {
+                    //console.log(res);
+                    resolve(res);
+                }
+            });
+    });
+
+}

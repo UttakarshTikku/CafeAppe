@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Console</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
+
+    <style>
+        add{
+            margin-bottom: 50px;
+            margin-top: 50px;
+        }
+    </style>
+
+    <script>
+
+        var removeIndexVP1 = undefined;
+        var removeIndexVP = undefined;
+        var rowToAddVP = undefined;
+
+        var toolbar = [{
+            text:'Delete',
+            iconCls:'icon-remove',
+            handler:function() {
+                if (removeIndexVP1 == undefined)
+                    return;
+                else {
+                    $.messager.confirm('Confirm', 'Are you sure you want to remove item from menu?', function (r) {
+                        if (r) {
+                            $('#vp1').datagrid('deleteRow', removeIndexVP1);
+                            removeIndexVP1 = undefined;
+                            if(rowToAddVP == undefined){
+                                return;
+                            }else{
+                                $('#vp').datagrid('insertRow', {
+                                    index: 0,
+                                    row:{
+                                        productname:rowToAddVP.productname,
+                                        productdescription:rowToAddVP.productdescription,
+                                        productsize:rowToAddVP.productsize,
+                                        productprice:rowToAddVP.productprice
+                                    }
+                                });
+                                rowToAddVP = undefined;
+                            }
+                        }
+                    });
+                }
+            }
+        }];
+
+        function addProduct(){
+            var data = $('#vp').datagrid('getSelected');
+            var dg1 = $('#vp1');
+
+            dg1.datagrid('insertRow',{
+                index: 0,
+                row:{
+                    productname:data.productname,
+                    productdescription:data.productdescription,
+                    productsize:data.productsize,
+                    productprice:data.productprice
+                }
+            });
+
+            if(removeIndexVP != undefined) {
+                $('#vp').datagrid('deleteRow', removeIndexVP);
+                removeIndexVP = undefined;
+            } else{
+                return;
+            }
+        }
+
+
+        function submitMenu() {
+            var dg1 = $('#vp1');
+            var data = dg1.datagrid('getData');
+            $('#menu').val(JSON.stringify(data));
+
+            console.log(data);
+        }
+
+        $(document).ready(function(){
+            //alert(JSON.stringify(data));
+            $('#vp').datagrid({
+                width:550,
+                height:600,
+                remoteSort:false,
+                singleSelect:true,
+                nowrap:false,
+                fitColumns:true,
+                url:'/getProductList',
+                onClickRow: function (index, row) {
+                    removeIndexVP = index;
+                },
+                columns:[[
+                    {field:'productname',title:'Product Name',width:100,sortable:true},
+                    {field:'productdescription',title:'Product Description',width:100,sortable:true},
+                    {field:'productsize',title:'Product Size',width:100,sortable:true},
+                    {field:'productprice',title:'Product Price',width:100,sortable:true}
+                ]],
+                detailFormatter: function(rowIndex, rowData){
+                    return '<table>' +
+                        '<td style="border:0">  + rowData.productname + </a> </td>'
+                        + '<td>' + rowData.description +'</td>'
+                        + '<td>' + rowData.size +'</td>'
+                        + '<td>' + rowData.productPrice +'</td>'
+                        + '<td> <input type="hidden" name="productSizeId" id="hiddenProductSizeId" value=' + rowData.productsizeid + '></td>'
+                        + '<td> <input type="hidden" name="productId" id="hiddenProductId" value=' + rowData.productsizeid + '></td>'
+                    '</table>';
+                }
+            });
+
+            var data = $.getJSON('/getMenuList', function(abc) {
+                $('#vp1').datagrid({
+                    data: abc,
+                    onClickRow: function (index, row) {
+                        removeIndexVP1 = index;
+                        rowToAddVP = row;
+                    }
+                });
+            });
+
+        });
+    </script>
+
+
+</head>
+<body>
+
+<h2>Create Menu</h2>
+<div style="margin:20px 0 10px 0;"></div>
+<div class="easyui-panel" style="width:1300px;height:600px;padding:10px;">
+    <div class="easyui-layout" data-options="fit:true">
+        <div data-options="region:'west',split:true" style="width:600px; height:600px; padding:10px">
+            <table id="vp" data-options="singleSelect:true"></table>
+        </div>
+        <div data-options="region:'east'" style="width:600px;padding:10px">
+            <table id="vp1" class="easyui-datagrid" style="width:550px;height:600px; padding:10px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar">
+                <thead>
+                <tr>
+                    <th data-options="field:'productname',width:100">Product Name</th>
+                    <th data-options="field:'productdescription',width:100">Product Description</th>
+                    <th data-options="field:'productsize',width:100,align:'right'">Product Size</th>
+                    <th data-options="field:'productprice',width:100,align:'right'">Product Price</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div data-options="region:'center'" style="padding:10px">
+            <button id="add" name="add" onclick="addProduct()">Add</button>
+        </div>
+    </div>
+</div>
+
+<form id = "updateff" method="post" action ="/createMenu">
+    <input type="submit" id="pUpdateSubmit" name="pUpdateSubmit" value="Create" onclick="submitMenu()">
+    <input type="hidden" name="menu" id="menu">
+</form>
+
+</body>
+</html>

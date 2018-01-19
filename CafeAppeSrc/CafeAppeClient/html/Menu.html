@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Console</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('#tt').datagrid({
+                width:1000,
+                height:600,
+                remoteSort:false,
+                singleSelect:true,
+                nowrap:false,
+                fitColumns:true,
+                toolbar: [{
+                    text:'Edit Menu',
+                    iconCls:'icon-edit',
+                    handler:function(){
+                        window.location.href= 'openMenu'
+                    }
+                }],
+                url:'/getMenuList',
+                columns:[[
+                    {field:'name',title:'Product Name',width:100,sortable:true},
+                    {field:'desc',title:'Product Description',width:100,sortable:true},
+                    {field:'priceSmall',title:'Price Small',width:100,sortable:true},
+                    {field:'priceMedium',title:'Price Medium',width:100,sortable:true},
+                    {field:'priceLarge',title:'Price Large',width:100,sortable:true},
+                ]],
+                detailFormatter: function(rowIndex, rowData){
+                    return '<table><tr>' +
+                        '<td style="border:0">' + rowData.name + ' </a> </td>'
+                        + '<td>' + rowData.desc +'</td>'
+                        + '<td>' + rowData.priceSmall +'</td>'
+                        + '<td>' + rowData.priceMedium +'</td>'
+                        + '<td>' + rowData.priceLarge +'</td>'
+                    '</tr></table>';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<h1>Menu</h1>
+<table id="tt"></table>
+
+<div id="dd" class="easyui-dialog" title="My Dialog" style="width:400px;height:200px;"
+     data-options="iconCls:'icon-save',resizable:true,modal:true" closed=true></div>
+</body>
+</html>
