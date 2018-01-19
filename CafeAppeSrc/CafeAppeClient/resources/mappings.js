@@ -12,7 +12,7 @@ module.exports.PATH = Object.freeze({
     PENDING_ORDERS_PATH: '/CafeAppeClient/html/viewPendingOrders.html',
     DELIVERED_ORDERS_PATH: '/CafeAppeClient/html/viewDeliveredOrders.html',
     CANCELED_ORDERS_PATH: '/CafeAppeClient/html/viewCanceledOrders.html',
-    MANAGE_OFFERS_PATH: '/CafeAppeClient/html/manageOffers.html'
+    MANAGE_OFFERS_PATH: '/CafeAppeClient/html/manageOffers.html',
     MENU_PATH: '/CafeAppeClient/html/Menu.html',
     OPEN_MENU_PATH: '/CafeAppeClient/html/createMenu.html'
 });

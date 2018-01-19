@@ -28,7 +28,7 @@ module.exports.SQL = Object.freeze({
     ADD_NEW_OFFER: "insert into cafeappe.offer (promocode,discount,startdate,enddate,createdby,createddatetime,modifiedby,modifieddatetime,billedquantity,soldquantity,description) values (($1),($2),($3),($4),1,now(),1,now(),($5),($6),($7))",
     ADD_PRODUCTS_FOR_NEW_OFFER: "INSERT INTO cafeappe.offer_product (promocode, productid, activeflag) VALUES (($1), ($2),true )",
     ADD_CAFES_FOR_NEW_OFFER: "INSERT INTO cafeappe.offer_cafe (promocode, cafeid, activeflag) VALUES (($1), ($2),true )",
-    GET_PRODUCTS_FOR_CAFE_IDS: "select * from cafeappe.product p inner join cafeappe.productsize ps on ps.productid = p.productid inner join cafeappe.menu m on ps.productid = m.productid and ps.productsizeid = m.productsizeid inner join cafeappe.cafe c on m.cafeid = c.cafeid where c.cafeid in ("
+    GET_PRODUCTS_FOR_CAFE_IDS: "select * from cafeappe.product p inner join cafeappe.productsize ps on ps.productid = p.productid inner join cafeappe.menu m on ps.productid = m.productid and ps.productsizeid = m.productsizeid inner join cafeappe.cafe c on m.cafeid = c.cafeid where c.cafeid in (",
     UPDATE_PRODUCT: "update CafeAppe.product set productname = ($2), modifieddatetime = ($3), modifiedby = ($4), description = ($5) where productid = ($1) ",
     UPDATE_PRODUCT_SIZE: "update CafeAppe.productsize set price = ($3), modifieddatetime = ($4), modifiedby = ($5), size = ($6) where productid = ($1) and productsizeid = ($2)",
     ARCHIVE_PRODUCT: "update CafeAppe.product set activeflag = false, modifieddatetime = now() where productid = ($1) ",
