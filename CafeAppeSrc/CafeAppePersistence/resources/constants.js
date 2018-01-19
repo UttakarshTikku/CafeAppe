@@ -1,13 +1,7 @@
 module.exports.SQL = Object.freeze({
-<<<<<<< HEAD
     DATASOURCE: 'postgres://localhost:5432/postgres',
-    CREATE_PRODUCT: "insert into CafeAppe.Product values ($1, (select nextval('CafeAppe.product_id_seq')), $2, $3, $4, $5, $6, $7)",
-    VIEW_PRODUCT: 'select p.productid, p.productname, ps.productsizeid, ps.price from CafeAppe.Product p , CafeAppe.productsize ps where p.productid = ps.productid and p.activeflag = true',
-=======
-    DATASOURCE: 'postgres://localhost:5432/akhileshlamba',
     CREATE_PRODUCT: "insert into CafeAppe.Product values ($1, (select nextval('CafeAppe.product_id_seq')), $2, $3, $4, $5, $6, $7, $8)",
     VIEW_PRODUCT: 'select p.productid, p.productname, p.description, ps.size, ps.productsizeid, ps.price from CafeAppe.Product p , CafeAppe.productsize ps where p.productid = ps.productid and p.activeflag = true and p.cafeId = 1',
->>>>>>> df13563ed01dbe1172e27f5b3aa1cfaa66390466
     VIEW_PRODUCT_BY_ID: 'select * from CafeAppe.product where productId = ($1)',
     CREATE_PRODUCT_SIZE: "insert into CafeAppe.ProductSize values ((select currval('CafeAppe.product_id_seq')) , (select nextval('CafeAppe.productsize_id_seq')), $1, $2, $3, $4, $5, $6, $7, $8)",
     VIEW_PRODUCT_SIZE_BY_ID: 'select * from CafeAppe.productSize where productId = ($2)',
