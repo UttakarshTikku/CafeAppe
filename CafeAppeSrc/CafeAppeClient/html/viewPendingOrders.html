@@ -1,0 +1,138 @@
+<html>
+  <head>
+    <title>Manage Orders</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script>
+    var openOrderId = 0;
+    $(document).ready(function(){
+      var intervalId = 0;
+      $('#pendingOrdersTable').datagrid({
+        width:1000,
+        height:250,
+        remoteSort:false,
+        url: '/getCafeOrders'+window.location.search+'&action=pending',
+        singleSelect:true,
+        nowrap:false,
+        fit:true,
+        fitColumns:true,
+        columns:[[
+            {field:'orderid',title:'Order Id',width:100,sortable:false},
+            {field:'ordertime',title:'Order Time',width:100,sortable:false},
+            {field:'deliverytime',title:'Expected Ready Time',width:100,sortable:false},
+            {field:'completed',title:'Is Order Completed',width:100,sortable:false}
+        ]],
+        onDblClickRow: function(rowIndex, rowData){
+          openOrderId = rowData.orderid;
+          $('#pendingItemViewer').window({
+            title: 'View Pending Order',
+            width: 500,
+            height: 350,
+            closed: false,
+            cache: false,
+            modal: true,
+            collapsible:false,
+            minimizable:false,
+            maximizable:false
+          });
+          $('#orderItemsList').datagrid({
+            width:1000,
+            height:250,
+            remoteSort:false,
+            singleSelect:true,
+            nowrap:false,
+            url:'/getOrderItemsByOrderId?orderId='+rowData.orderid,
+            fit:true,
+            fitColumns:true,
+            columns:[[
+                {field:'productname',title:'Product Name',width:100,sortable:false},
+                {field:'productsizeid',title:'Product Size',width:100,sortable:false},
+                {field:'quantity',title:'Quantity',width:100,sortable:false},
+                {field:'itemcost',title:'Billed Amount',width:100,sortable:false},
+                {field:'isItemReady',title:'Completed?',width:100,sortable:false, formatter:function(value,row){
+                  if(value)
+                    return '<input type="checkbox" class="easyui-switchbutton" checked>';
+                  else
+                    return '<input type="checkbox" class="easyui-switchbutton">';
+            	   }
+               }
+            ]]
+          });
+        }
+      });
+      $("#orderItemsList").datagrid({
+          onLoad:function(){
+              $('.easyui-switchbutton').switchbutton();
+          }
+      });
+      $(function() {
+      function grid_refresh() {
+        	$('#pendingOrdersTable').datagrid('reload');
+        	setTimeout(grid_refresh, 5000);
+        }
+        grid_refresh();
+      });
+
+    });
+    function completeOrderCall(){
+      $.get('/completeOrder?orderid='+openOrderId);
+      $('#pendingItemViewer').window('close');
+    }
+
+    function cancelOrderCall(){
+      $('#cancelReasonForm').window({
+        title: 'Cancel Order',
+        width: 500,
+        height: 180,
+        closed: false,
+        cache: false,
+        modal: true,
+        collapsible:false,
+        minimizable:false,
+        maximizable:false
+      });
+    }
+    function submitCancelRequest() {
+      document.getElementById("cancelOrderId").value = openOrderId;
+      document.getElementById("cafeidfield").value = window.location.search;
+      document.getElementById("ff").submit();
+      eraseCancelRequest();
+      $('#pendingItemViewer').window('close');
+    }
+    function eraseCancelRequest(){
+       $('#ff').form('clear');
+       $('#cancelReasonForm').window('close');
+    }
+    </script>
+  </head>
+  <body>
+    <table id="pendingOrdersTable"></table>
+    <div id="pendingItemViewer" class="easyui-window" style="width:400px;height:200px;"
+            data-options="resizable:false,modal:true" closed=true>
+        <table id="orderItemsList"/>
+        <a onclick="completeOrderCall()" class="easyui-splitbutton" data-options="menu:'#mm1',iconCls:'icon-ok'">Complete Order</a>
+        <div id="mm1" style="width:100px;">
+          <div onclick = "cancelOrderCall()" data-options="iconCls:'icon-cancel'">Cancel</div>
+        </div>
+            <div id="cancelReasonForm" class="easyui-window" style="width:200px;height:50px;"
+                    data-options="resizable:false,modal:true" closed=true>
+                <form id="ff" name="ff" action="/cancelOrder" method="post">
+                    <div style="margin-bottom:20px">
+                      <b>Cancel Reason:</b><br>
+                        <input class="easyui-textbox" id="cancelReason" name="cancelReason" style="width:100%;height:60px" multiline="true" data-options="multiline:true">
+                    </div>
+                    <input type = "hidden" id="cancelOrderId" name="cancelOrderId"/>
+                    <input type = "hidden" id="cafeidfield" name="cafeidfield"/>
+                </form>
+                <div style="text-align:center;padding:5px 0">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitCancelRequest()" style="width:30%">Cancel Order</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="eraseCancelRequest()" style="width:30%">Back</a>
+                </div>
+          </div>
+      </div>
+  </body>
+</html>

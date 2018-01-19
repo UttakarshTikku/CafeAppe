@@ -59,16 +59,14 @@ $(document).ready(function(){
       });
       $('#cafe_stateid').combobox('readonly', true);
       $('#updateCafeButton').attr('hidden', true);
-      $('#deleteCafeButton').attr('hidden', true);
+      $('#viewMenu').attr('hidden', false);
       var addressParts = rowData.address.split(",");
       $('#cafeDetails').form('load',{
           cafe_name: rowData.cafename,
           cafe_unitnumber: addressParts[0].trim(),
           cafe_streetname:addressParts[1].trim(),
           cafe_stateid:addressParts[2].trim(),
-          cafe_manage_url: '/manageCafe?cafeId='+rowData.cafeid,
-          cafe_archive_url: '/archiveCafe?cafeId='+rowData.cafeid,
-          cafe_menu_view_url: '/viewCafeMenu?cafeId='+rowData.cafeid
+          cafe_id: rowData.cafeid
       });
       $('#cafe_name,#cafe_unitnumber,#cafe_streetname,#cafe_stateid').attr('readOnly',true);
     }
@@ -98,14 +96,19 @@ function editCafeInformation(){
   $('#cafe_name,#cafe_unitnumber,#cafe_streetname,#cafe_stateid').attr('readOnly',false);
   $('#cafe_stateid').combobox('readonly', false);
   $('#updateCafeButton').attr('hidden', false);
-  $('#deleteCafeButton').attr('hidden', true);
+  $('#viewMenu').attr('hidden', true);
 }
 
 function archiveCafeInformation(){
-  $('#cafe_name,#cafe_unitnumber,#cafe_streetname,#cafe_stateid').attr('readOnly',true);
-  $('#cafe_stateid').combobox('readonly', true);
-  $('#updateCafeButton').attr('hidden', true);
-  $('#deleteCafeButton').attr('hidden', false);
+  $.messager.confirm('Confirm','Are you sure you want to archive this cafe?',function(r){
+    if (r){
+        window.location.href ='/archiveCafe?cafeId='+document.getElementById('cafe_id').value;
+    }
+  });
+}
+
+function manageOrdersFunction(){
+  window.location.href ='/manageOrders?cafeId='+document.getElementById('cafe_id').value;
 }
 
 </script>
@@ -146,9 +149,23 @@ function archiveCafeInformation(){
           </table>
           </td></tr>
         </table>
+        <input id="cafe_id" name="cafe_id" type='hidden' />
         <input id = "updateCafeButton" type = "submit" value="Update"/>
-        <input id = "deleteCafeButton" type = "submit" value="Delete"/>
         </form>
+
+        <div>
+          <table>
+            <tr>
+              <td>
+                <a id = "viewMenu" href = "#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">View Menu</a>
+              </td>
+              <td>
+                <a id = "manageOrders" onclick="manageOrdersFunction();" class="easyui-linkbutton" data-options="iconCls:'icon-print'">Manage Orders</a>
+              </td>
+          </tr>
+        </table>
+        </div>
+
       </div>
 
       <div id="win" class="easyui-window" title="Add New Cafe" style="width:1000px;height:800px;" closed="true">

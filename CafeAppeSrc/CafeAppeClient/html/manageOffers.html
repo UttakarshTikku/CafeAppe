@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Manage Offers</title>
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
+<script>
+
+var toolbar = [{
+          text:'Create Offer',
+          iconCls:'icon-add',
+          handler:function(){
+            $('#win').dialog({
+              title: "Create New Offer",
+              width: '360px',
+              height: '430px',
+              closed: false,
+              cache: false,
+              modal: true
+              });
+          }
+}];
+var list, oldList;
+function productDataFetch() {
+  if(oldList != list){
+    var url = '/getProductListForCafeIds';
+    for (var i=0; i<list.length; ++i) {
+        if (url.indexOf('?') === -1) {
+            url = url + '?array[]=' + list[i];
+        }else {
+            url = url + '&array[]=' + list[i];
+        }
+    }
+    alert(url);
+    $('#product').combobox("reload", url);
+  }
+  oldList = list;
+}
+
+$(document).ready(function(){
+$('#promo_cafes,#cafes').combobox({
+
+    url: '/getCafeList',
+    valueField: 'cafeid',
+    textField: 'cafename',
+    multiple:true,
+    formatter: formatItem
+
+});
+
+$('#cafes').combobox({
+  onChange: function(newValue){
+    list = newValue;
+  }
+});
+  $('#tt').datagrid({
+    width:1000,
+    height:250,
+    remoteSort:false,
+    singleSelect:true,
+    nowrap:false,
+    fitColumns:true,
+    url:'/getOfferList',
+    columns:[[
+        {field:'promocode',title:'Promocode',width:100,sortable:true},
+        {field:'description',title:'Description',width:100,sortable:true}
+    ]],
+    detailFormatter: function(rowIndex, rowData){
+        return '<table><tr>' +
+                '<td style="border:0">' + rowData.promocode + ' </a> </td>'
+                + '<td>' + rowData.description +'</td>'
+                '</tr></table>';
+    },
+    onDblClickRow: function(rowIndex, rowData){
+      $('#dd').window({
+        title: rowData.promocode,
+        width: 400,
+        height: 350,
+        closed: false,
+        cache: false,
+        modal: true,
+        collapsible:false,
+        minimizable:false,
+        maximizable:false
+      });
+
+      var temp = rowData.startdate.split("T")[0].split("-");
+      var sd = temp[2]+"/"+temp[1]+"/"+temp[0];
+      temp = rowData.enddate.split("T")[0].split("-");
+      var ed = temp[2]+"/"+temp[1]+"/"+temp[0];
+
+      $('#offerDetails').form('load',{
+        promo_code: rowData.promocode,
+        promo_discount: rowData.discount,
+        promo_sold: rowData.soldquantity,
+        promo_billed: rowData.billedquantity,
+        promo_description: rowData.description,
+        promo_start: sd,
+        promo_end: ed
+      });
+      // $('#promo_start').datebox('setValue', );
+    }
+  });
+});
+function archiveOffer(){
+  $.messager.confirm('Confirm','Are you sure you want to archive this offer?',function(r){
+    if (r){
+        window.location.href ='/archiveOffer?promocode='+document.getElementById('cafe_id').value;
+    }
+  });
+};
+
+function formatItem(row){
+  var s = '<span style="font-weight:bold">' + row.cafename + '</span><br/>' +
+                    '<span style="color:#888">' + row.address + '</span>';
+            return s;
+}
+
+$.fn.datebox.defaults.formatter = function(date) {
+
+  var y = date.getFullYear();
+  var m = date.getMonth() + 1;
+  var d = date.getDate();
+  console.log((d < 10 ? '0' + d : d) + '/' + (m < 10 ? '0' + m : m) + '/' + y);
+  return (d < 10 ? '0' + d : d) + '/' + (m < 10 ? '0' + m : m) + '/' + y;
+};
+
+$.fn.datebox.defaults.parser = function(s) {
+  if (s) {
+    var a = s.split('/');
+    var d = new Number(a[0]);
+    var m = new Number(a[1]);
+    var y = new Number(a[2]);
+    var dd = new Date(y, m-1, d);
+    return dd;
+  } else {
+    return new Date();
+  }
+};
+
+</script>
+
+</head>
+<body>
+
+<h1>Live Promos</h1>
+<table id="tt" data-options="toolbar:toolbar"></table>
+
+<div id="dd" class="easyui-window" style="width:400px;height:220px;"
+        data-options="tools:'#tools',resizable:false,modal:true" closed=true>
+        <form id = "offerDetails" method="post" action ="/updateOfferDetails">
+          <table style='padding:2px'>
+            <tr><td>
+            Promocode:</td><td>
+              <input class="easyui-textbox" id="promo_code" name="promo_code"  />
+            </td></tr>
+            <tr>
+              <td>Discount:</td>
+              <td><input class="easyui-numberbox" precision="2" id="promo_discount" name="promo_discount"  ></td>
+            </tr>
+            <tr>
+              <td>Cafe Selection:</td>
+              <td><input class="easyui-combobox" id="promo_cafes" name="promo_cafes"  ></td>
+            </tr>
+            <tr>
+              <td>Product Selection:</td>
+              <td>
+                <input id="promo_product" class="easyui-combotree" data-options="multiple:true, cascadeCheck:true"/>
+              </td>
+            </tr>
+            <tr>
+              <td>Selling Quantity:</td>
+              <td>
+                <input id="promo_sold" name="promo_sold" class="easyui-numberbox" data-options="valueField:'id',textField:'text' "  />
+              </td>
+            </tr>
+            <tr>
+              <td>Billing Quantity:</td>
+              <td>
+                <input id="promo_billed" name="promo_billed" class="easyui-numberbox" data-options="valueField:'id',textField:'text' "  />
+              </td>
+            </tr>
+            <tr>
+              <td>Description:</td>
+              <td>
+                <input id="promo_description" name="promo_description" style="width:100%;height:50px" multiline="true" class="easyui-textbox"/>
+              </td>
+            </tr>
+            <tr>
+              <td>Start Date:</td>
+              <td>
+                <input id="promo_start" name="promo_start" class="easyui-datebox" />
+              </td>
+            </tr>
+            <tr>
+              <td>End Date:</td>
+              <td>
+                <input id="promo_end" name="promo_end" class="easyui-datebox"/>
+              </td>
+            </tr>
+        </table>
+        <input id = "updateOfferButton" type = "submit" value="Update"/>
+        </form>
+      </div>
+
+      <div id="win" class="easyui-window" title="Add New Cafe" style="width:1000px;height:1000px;" closed="true">
+              <h1>Start New Promotion</h1>
+              <form style="margin-left: auto; margin-right: auto; padding: 10px" action = "/addOfferSubmit" method="post"  >
+                <table style='padding:2px'>
+                  <tr><td>
+                  Promocode:</td><td>
+                    <input class="easyui-textbox" id="promocode" name="promocode"  />
+                  </td></tr>
+                  <tr>
+                    <td>Discount:</td>
+                    <td><input class="easyui-numberbox" precision="2" id="discount" name="discount"  ></td>
+                  </tr>
+                  <tr>
+                    <td>Cafe Selection:</td>
+                    <td><input class="easyui-combobox" id="cafes" name="cafes" onblur="checkUpdateReqd();"></td>
+                  </tr>
+                  <tr>
+                    <td>Product Selection:</td>
+                    <td>
+                      <input id="product" name="product" class="easyui-combobox" style="width:80%" data-options="valueField:'id',textField:'text' "/>
+                      <a href="#" onclick="productDataFetch()" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="width:15%"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Selling Quantity:</td>
+                    <td>
+                      <input id="sold" name="sold" class="easyui-numberbox" data-options="valueField:'id',textField:'text' "  />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Billing Quantity:</td>
+                    <td>
+                      <input id="billed" name="billed" class="easyui-numberbox" data-options="valueField:'id',textField:'text' "  />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Description:</td>
+                    <td>
+                      <input id="description" name="description" style="width:100%;height:50px" multiline="true" class="easyui-textbox"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Start Date:</td>
+                    <td>
+                      <input id="start" name="start" class="easyui-datebox" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>End Date:</td>
+                    <td>
+                      <input id="end" name="end" class="easyui-datebox"/>
+                    </td>
+                  </tr>
+              </table>
+                <input type = "submit" value="Add" onclick="dateFormatter()"/>
+              </form>
+            </div>
+
+            <div id="tools">
+                <a class="icon-edit" onclick="editOfferInformation()"></a>
+                <a class="icon-remove" onclick="archiveOffer()"></a>
+            </div>
+
+<p><a href = "/archivedOffers">View Archived Offers...</a></p>
+</body>
+</html>
