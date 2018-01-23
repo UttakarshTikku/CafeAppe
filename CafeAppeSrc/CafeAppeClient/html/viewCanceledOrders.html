@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <title>Manage Orders</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script>
+    var selectedOrderId = 0;
+    $(document).ready(function(){
+      $('#canceledOrdersTable').datagrid({
+        width:1000,
+        height:250,
+        remoteSort:false,
+        singleSelect:true,
+        nowrap:false,
+        url: '/getCafeOrders'+window.location.search+'&action=canceled',
+        fit:true,
+        fitColumns:true,
+        columns:[[
+            {field:'orderid',title:'Order Id',width:100,sortable:true},
+            {field:'ordertime',title:'Order Time',width:100,sortable:true},
+            {field:'canceledReason', title:'Canceled Reason', width:100,sortable:true}
+        ]],
+        onDblClickRow: function(rowIndex, rowData){
+          selectedOrderId = rowData.orderid;
+          openOrderId = rowData.orderid;
+          $('#cancelledItemViewer').window({
+            title: 'View Canceled Order',
+            width: 500,
+            height: 250,
+            closed: false,
+            cache: false,
+            modal: true,
+            collapsible:false,
+            minimizable:false,
+            maximizable:false
+          });
+          $('#orderItemsList').datagrid({
+            width:1000,
+            height:250,
+            remoteSort:false,
+            singleSelect:true,
+            nowrap:false,
+            url:'/getOrderItemsByOrderId?orderId='+rowData.orderid,
+            fit:true,
+            fitColumns:true,
+            columns:[[
+                {field:'productname',title:'Product Name',width:100,sortable:false},
+                {field:'productsizeid',title:'Product Size',width:100,sortable:false},
+                {field:'quantity',title:'Quantity',width:100,sortable:false},
+                {field:'itemcost',title:'Billed Amount',width:100,sortable:false},
+                {field:'isItemReady',title:'Completed?',width:100,sortable:false, formatter:function(value,row){
+                  if(value)
+                    return '<input type="checkbox" class="easyui-switchbutton" checked>';
+                  else
+                    return '<input type="checkbox" class="easyui-switchbutton">';
+            	   }
+               }
+            ]]
+          });
+        }
+      });
+      $(function() {
+      function grid_refresh() {
+          $('#canceledOrdersTable').datagrid('reload');
+          setTimeout(grid_refresh, 5000);
+        }
+        grid_refresh();
+      });
+    });
+    function undoCancelOrder(){
+      $.get('/undoCancelOrder?orderid='+selectedOrderId);
+      $('#cancelledItemViewer').window('close');
+    }
+    </script>
+  </head>
+  <body>
+    <table id="canceledOrdersTable"></table>
+    <div id="cancelledItemViewer" class="easyui-window" style="width:400px;height:200px;"
+            data-options="resizable:false,modal:true" closed=true>
+        <table id="orderItemsList"/>
+        <a onclick="undoCancelOrder()" text-align="center" class="easyui-linkbutton" data-options="iconCls:'icon-undo'">Undo Cancel Order</a>
+    </div>
+  </body>
+</html>

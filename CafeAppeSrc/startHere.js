@@ -260,6 +260,7 @@ app.post('/getProductList', function (req, res) {
             }
             res.contentType('application/json');
             res.send(JSON.stringify(result));
+            res.end();
         }).catch(function(error){
             console.log(error);
         });

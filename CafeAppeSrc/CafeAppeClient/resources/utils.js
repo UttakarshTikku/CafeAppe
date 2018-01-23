@@ -80,3 +80,10 @@ module.exports.persistenceServiceCallSansParams = (servicePath) => {
   httpreq.end();
 });
 };
+
+module.exports.redirectToURL = (response, url) => {
+  response.writeHead(302, {
+      'Location': url
+    });
+    response.end();
+}

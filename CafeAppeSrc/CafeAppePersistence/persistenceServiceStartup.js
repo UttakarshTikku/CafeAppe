@@ -19,12 +19,95 @@ app.post('/getCafes', function (req, res){
     });
 });
 
+app.post('/getProductsForCafeIds', function (req, res){
+    cafeDAO.getProductsForCafeIds(req.body.cafeIds).then(function(fulfilled){
+      return res.send(fulfilled);
+    }).catch(function (error) {
+      console.log(error);
+    });
+});
+
+app.post('/getOffers', function (req, res){
+    cafeDAO.getOfferList().then(function(fulfilled){
+      return res.send(fulfilled);
+    }).catch(function (error) {
+      console.log(error);
+    });
+});
+
+app.post('/getArchivedCafes', function (req, res){
+    cafeDAO.getArchivedCafeList().then(function(fulfilled){
+      return res.send(fulfilled);
+    }).catch(function (error) {
+      console.log(error);
+    });
+});
+
+app.post('/getOrdersByCafeId', function (req, res){
+    if(req.body.action == 'pending'){
+      cafeDAO.getOrdersByCafeId(req.body.cafeid, false, false).then(function(fulfilled){
+        return res.send(fulfilled);
+      }).catch(function (error) {
+        console.log(error);
+      });
+    } else if (req.body.action == 'delivered') {
+      cafeDAO.getOrdersByCafeId(req.body.cafeid, true, false).then(function(fulfilled){
+        return res.send(fulfilled);
+      }).catch(function (error) {
+        console.log(error);
+      });
+    } else if (req.body.action == 'canceled') {
+      cafeDAO.getOrdersByCafeId(req.body.cafeid, false, true).then(function(fulfilled){
+        return res.send(fulfilled);
+      }).catch(function (error) {
+        console.log(error);
+      });
+    } else {
+      console.log('Invalid request');
+    }
+});
+
+app.post('/getOrderItems',function(req, res){
+  cafeDAO.getOrderItemsByOrderId(req.body.orderId).then(function(fulfilled){
+    return res.send(fulfilled);
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
 app.post('/getStates', function (req, res){
       generalDAO.getStates.then(function(fulfilled){
       return res.send(fulfilled);
     }).catch(function (error) {
       console.log(error);
     });
+});
+
+app.post('/completeOrderByOrderId', function (req, res){
+  cafeDAO.markOrderItemsCompleted(req.body.orderid).then(function(fulfilled){
+    cafeDAO.completeOrderByOrderId(req.body.orderid);
+  }).catch(function(error){
+        console.log(error);
+      })
+});
+
+app.post('/undoCancelOrderByOrderId', function (req, res){
+  cafeDAO.undoCancelOrderByOrderId(req.body.orderid).catch(function(error){
+        console.log(error);
+      })
+});
+
+app.post('/undoCompletedOrderByOrderId', function (req, res){
+  cafeDAO.undoCompletedOrderByOrderId(req.body.orderid).catch(function(error){
+        console.log(error);
+      })
+});
+
+app.post('/cancelOrderByOrderId', function (req, res){
+  console.log('trying to cancel');
+  cafeDAO.cancelOrderByOrderId(req.body.orderid).catch(function(error){
+        console.log(error);
+      })
 });
 
 app.post('/getSuburbs', function (req, res){
@@ -35,10 +118,39 @@ app.post('/getSuburbs', function (req, res){
     });
 });
 
+app.post('/updateCafeInformation', function (req, res){
+    cafeDAO.updateAddress(req.body.unitNumber, req.body.streetName, 5599 /*req.body.suburb*/, req.body.cafeid).then(
+        cafeDAO.updateCafe( req.body.cafeid, req.body.cafeName, 1)).catch(function (error){
+          console.log(error);
+        });
+});
+
 app.post('/addNewCafe', function (req, res){
     cafeDAO.addNewLocation(10, 10).then(
       cafeDAO.addNewAddress(req.body.unitNumber, req.body.streetName, req.body.suburb)).then(
         cafeDAO.addNewCafe( req.body.cafeName, 1, 1)).catch(function (error){
+          console.log(error);
+        });
+});
+
+app.post('/addNewOffer', function (req, res){
+    cafeDAO.addNewOffer(req.body).then(
+      cafeDAO.addProductsForOffer(req.body)
+    ).then(
+      cafeDAO.addCafesForOffer(req.body)
+    ).catch(function(error){
+      console.log(error);
+    });
+});
+
+app.post('/setCafeActiveFlagFalse', function (req, res){
+    cafeDAO.setCafeActiveFlagFalse(req.body.cafeId).catch(function (error){
+          console.log(error);
+        });
+});
+
+app.post('/setCafeActiveFlagTrue', function (req, res){
+    cafeDAO.setCafeActiveFlagTrue(req.body.cafeId).catch(function (error){
           console.log(error);
         });
 });
