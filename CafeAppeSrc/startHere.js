@@ -12,10 +12,13 @@ var app = express();
 
 var bodyParser = require("./node-postgres-todo/node_modules/body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
-app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
     res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADMIN_PAGE_PATH));
+});
+
+app.get('/manageOffer', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.MANAGE_OFFERS_PATH));
 });
 
 app.get('/addCafe', function (req, res) {
@@ -31,15 +34,115 @@ app.post('/addCafeSubmit', function (req, res) {
       postcode: req.body.postcode,
       suburb: req.body.suburb
   }),'/addNewCafe').then(function(fulfilled){
-    res.writeHead(302, {
-        'Location': '/viewCafe'
-      });
-      res.end();
+      utils.redirectToURL(res, '/viewCafe');
+    }).catch(function(error){ console.log(error); });
+});
+
+app.post('/addOfferSubmit', function (req, res) {
+  utils.persistenceServiceCallWithParams(querystring.stringify({
+      promocode: req.body.promocode,
+      discount: req.body.discount,
+      cafes: req.body.cafes,
+      product: req.body.product,
+      sold: req.body.sold,
+      billed: req.body.billed,
+      description: req.body.description,
+      start: req.body.start,
+      end: req.body.end
+  }),'/addNewOffer').then(function(fulfilled){
+      utils.redirectToURL(res, '/manageOffer');
+    }).catch(function(error){ console.log(error); });
+});
+
+app.post('/updateCafeDetails', function (req, res) {
+  utils.persistenceServiceCallWithParams(querystring.stringify({
+      cafeName: req.body.cafe_name,
+      unitNumber: req.body.cafe_unitnumber,
+      streetName: req.body.cafe_streetname,
+      state: req.body.cafe_stateid,
+      suburb: req.body.suburb,
+      cafeid: req.body.cafe_id
+  }),'/updateCafeInformation').then(function(fulfilled){
+    utils.redirectToURL(res, '/viewCafe');
     }).catch(function(error){ console.log(error); });
 });
 
 app.get('/viewCafe', function (req, res) {
     res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.VIEW_CAFE_PATH));
+});
+
+app.get('/manageOrders', function (req, res) {
+  res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.MANAGE_ORDERS_PATH));
+});
+
+app.get('/pendingOrders', function (req, res) {
+  res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.PENDING_ORDERS_PATH));
+});
+
+app.get('/deliveredOrders', function (req, res) {
+  res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.DELIVERED_ORDERS_PATH));
+});
+
+app.get('/canceledOrders', function (req, res) {
+  res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.CANCELED_ORDERS_PATH));
+});
+
+app.post('/getOrderItemsByOrderId', function (req, res) {
+  utils.persistenceServiceCallWithParamsAndResponse(querystring.stringify({
+    orderId: req.query.orderId
+  }), '/getOrderItems').then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({productname:temp.productname,productsizeid:temp.productsizeid,quantity: temp.quantity,
+      itemcost:temp.itemcost,isItemReady: temp.isitemready});
+    }
+    res.contentType('application/json');
+    res.json(result);
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
+app.post('/getCafeOrders', function (req, res) {
+  utils.persistenceServiceCallWithParamsAndResponse(querystring.stringify({
+      cafeid: req.query.cafeId,
+      action: req.query.action
+  }),'/getOrdersByCafeId').then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({cafeid:temp.cafeid,orderid:temp.orderid,userid: temp.userid,
+      promocode:temp.promocode,locationid: temp.locationid, deliverytime: temp.expecteddeliverytime,
+      ordertime: temp.orderplacedat, isdeliveredflag: temp.isdeliveredflag,
+      ordertypeid: temp.ordertypeid, iscancelledflag: temp.iscancelledflag});
+    }
+    res.contentType('application/json');
+    res.json(result);
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
+app.get('/archiveCafe', function (req, res) {
+  console.log(req.query.cafeId);
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        cafeId: req.query.cafeId
+    }), '/setCafeActiveFlagFalse').then(function(fulfilled){
+        utils.redirectToURL(res, '/viewCafe');
+    }).catch(function(){
+      console.log(error);
+    });
+});
+
+app.get('/reopenArchiveCafe', function (req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        cafeId: req.query.cafeId
+    }), '/setCafeActiveFlagTrue').then(function(fulfilled){
+      utils.redirectToURL(res, '/archivedCafe');
+    }).catch(function(){
+      console.log(error);
+    });
 });
 
 app.post('/getCafeList', function (req, res) {
@@ -51,6 +154,75 @@ app.post('/getCafeList', function (req, res) {
     }
     res.contentType('application/json');
     res.send(JSON.stringify(result));
+    res.end();
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
+app.post('/getCafeListForPromo', function (req, res) {
+  utils.persistenceServiceCallSansParams('/getCafes').then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({id:temp.cafeid,text:temp.cafename});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+    res.end();
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
+app.post('/getProductListForCafeIds', function(req, res){
+  utils.persistenceServiceCallWithParamsAndResponse(
+    querystring.stringify({
+        cafeIds: req.query.array
+    }),
+    '/getProductsForCafeIds'
+  ).then(function(fulfilled){
+    console.log(fulfilled);
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({id:temp.suburbid,text:temp.suburbname});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+    res.end();
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
+app.post('/getOfferList', function (req, res) {
+  utils.persistenceServiceCallSansParams('/getOffers').then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({promocode:temp.promocode,description:temp.description, discount: temp.discount, productid: temp.productid,
+         cafeid: temp.cafeid, startdate:temp.startdate, enddate: temp.enddate, createdby: temp.createdby, createddatetime: temp.createddatetime,
+         modifiedby: temp.modifiedby, modifieddatetime: temp.modifieddatetime, billedquantity: temp.billedquantity, soldquantity: temp.soldquantity});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+    res.end();
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+
+app.post('/getArchivedCafeList', function (req, res) {
+  utils.persistenceServiceCallSansParams('/getArchivedCafes').then(function(fulfilled){
+    var result = [];
+    for(var k in JSON.parse(fulfilled).rows) {
+      var temp = JSON.parse(fulfilled).rows[k];
+      result.push({cafeid:temp.cafeid,cafename:temp.cafename,address: temp.unitnumber+", "+temp.streetname+", "+temp.stateid});
+    }
+    res.contentType('application/json');
+    res.send(JSON.stringify(result));
+    res.end();
   }).catch(function(error){
     console.log(error);
   });
@@ -93,7 +265,6 @@ app.post('/getProductList', function (req, res) {
         });
 });
 
-
 app.post('/getStatesList', function (req, res) {
   utils.persistenceServiceCallSansParams('/getStates').then(function(fulfilled){
     var result = [];
@@ -103,6 +274,7 @@ app.post('/getStatesList', function (req, res) {
     }
     res.contentType('application/json');
     res.send(JSON.stringify(result));
+    res.end();
   }).catch(function(error){
     console.log(error);
   });
@@ -119,6 +291,7 @@ app.post('/getSuburbList', function (req, res) {
     }
     res.contentType('application/json');
     res.send(JSON.stringify(result));
+    res.end();
   }).catch(function(error){
   console.log(error);
   });
@@ -193,6 +366,46 @@ app.get('/getProductSelected', function(req, res) {
     });
 });
 
+app.get('/completeOrder', function (req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+      orderid: req.query.orderid
+    }),'/completeOrderByOrderId' ).then(function(fulfilled){
+      utils.redirectToURL(res, '/pendingOrders');
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+app.get('/undoCancelOrder', function (req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+      orderid: req.query.orderid
+    }),'/undoCancelOrderByOrderId' ).then(function(fulfilled){
+      utils.redirectToURL(res, '/canceledOrders');
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+app.get('/undoCompleteOrder', function (req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+      orderid: req.query.orderid
+    }),'/undoCompletedOrderByOrderId' ).then(function(fulfilled){
+      utils.redirectToURL(res, '/deliveredOrders');
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+app.post('/cancelOrder', function (req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+      orderid: req.body.cancelOrderId
+    }),'/cancelOrderByOrderId' ).then(function(fulfilled){
+      console.log('returned to client');
+      utils.redirectToURL(res, '/pendingOrders'+req.body.cafeidfield);
+    }).catch(function(error){
+        console.log(error);
+    });
+});
 
 app.post('/UpdateProductSubmit', function(req, res) {
     utils.persistenceServiceCallWithParams(querystring.stringify({
@@ -203,10 +416,8 @@ app.post('/UpdateProductSubmit', function(req, res) {
         pId: req.body.productId,
         pSizeId: req.body.hiddenUpdateProductSizeId
     }),'/updateProductSubmits').then(function(fulfilled){
-        res.writeHead(302,{
-            'Location': '/viewProduct'
-        });
-        res.end();
+        console.log(fulfilled);
+        utils.redirectToURL(res, '/viewProduct');
     }).catch(function(error){
         console.log(error);
     });
@@ -220,10 +431,7 @@ app.get('/getProductToArchive', function(req, res) {
         pId: req.query.id,
         pSizeId: req.query.sizeid
     }),'/archiveProduct').then(function(fulfilled){
-        res.writeHead(302,{
-            'Location': '/viewProduct'
-        });
-        res.end();
+        utils.redirectToURL(res, '/viewProduct');
     }).catch(function(error){
         console.log(error);
     });
