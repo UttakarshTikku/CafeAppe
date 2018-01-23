@@ -58,13 +58,13 @@ app.post('/getCafeList', function (req, res) {
 
 app.post('/addProductSubmit', function(req, res) {
 
-        var PriceSize = JSON.parse(req.body.pPriceHidden);
-        console.log(PriceSize);
+        //var PriceSize = JSON.parse(req.body.pPriceHidden);
+        //console.log(PriceSize);
       utils.persistenceServiceCallWithParams(querystring.stringify({
-          name: req.body.pName,
-          desc: req.body.pDesc,
+          name: req.body.pNewName,
+          desc: req.body.pNewDesc,
           priceSize: req.body.pPriceHidden
-      }),'/addProductSubmits').then(function(fulfilled){
+      }),'/addProductSubmits1').then(function(fulfilled){
             res.writeHead(302,{
              'Location': '/viewProduct'
             });
@@ -80,8 +80,10 @@ app.post('/getProductList', function (req, res) {
             for(var k in JSON.parse(fulfilled).rows) {
                 var temp = JSON.parse(fulfilled).rows[k];
                 result.push({productid:temp.productid,
-                    productname:temp.productname, productsize:temp.size,
-                    productprice:temp.price, productsizeid:temp.productsizeid,
+                    productname:temp.productname,
+                    productsize:temp.size,
+                    productprice:temp.price,
+                    productsizeid:temp.productsizeid,
                     productdescription:temp.description});
             }
             res.contentType('application/json');
@@ -154,6 +156,22 @@ app.get('/openMenu', function (req, res) {
     res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.OPEN_MENU_PATH));
 });
 
+app.get('/manageOffers', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.MANAGE_OFFERS_PATH));
+});
+
+app.get('/manageRewards', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.MANAGE_REWARDS_PATH));
+});
+
+app.get('/admin', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADMIN_PAGE_PATH));
+});
+
+app.get('/addOns', function (req, res) {
+    res.sendFile(path.resolve(constants.PATH.PROJECT_PATH + constants.PATH.ADDONS_PATH));
+});
+
 app.get('/getProductSelected', function(req, res) {
 
     utils.persistenceServiceCallWithParamsAndResponse(querystring.stringify({
@@ -221,10 +239,13 @@ app.post('/createMenu', function(req, res) {
     }),'/deleteMenu').then(function(fulfilled){
         for(var k in dataToBeInserted.rows){
             utils.persistenceServiceCallWithParams(querystring.stringify({
-                pName: dataToBeInserted.rows[k].productname,
+                /*pName: dataToBeInserted.rows[k].productname,
                 pDesc: dataToBeInserted.rows[k].productdescription,
                 pSize: dataToBeInserted.rows[k].productsize,
-                pPrice: dataToBeInserted.rows[k].productprice,
+                pPrice: dataToBeInserted.rows[k].productprice,*/
+                cafeId: 1,
+                pId: dataToBeInserted.rows[k].productid,
+                psId: dataToBeInserted.rows[k].productsizeid
             }),'/createMenuSubmit').then(function(fulfilled1){
                 //console.log(fulfilled1);
             }).catch(function(error){
@@ -247,10 +268,13 @@ app.post('/getMenuList', function (req, res) {
         //console.log(fulfilled);
         for(var k in JSON.parse(fulfilled).rows) {
             var temp = JSON.parse(fulfilled).rows[k];
-            result.push({productname:temp.productname,
-                productdescription:temp.productdescription,
-                productsize:temp.productsize,
-                productprice:temp.productprice
+            result.push({
+                productid: temp.productid,
+                productname:temp.productname,
+                productdescription:temp.description,
+                productsizeid:temp.productsizeid,
+                productsize:temp.size,
+                productprice:temp.price
                 });
         }
         var combinedData = [];
@@ -309,7 +333,7 @@ app.post('/getMenuList', function (req, res) {
                     }
                 }
                 if(Object.keys(data).length === 0 && data.constructor === Object){
-                    console.log('inside if statement of empty data');
+                    //console.log('inside if statement of empty data');
                     if (result[i].productsize === 'small' || result[i].productsize === 's') {
                         combinedData.push({
                             name: result[i].productname,
@@ -356,14 +380,273 @@ app.get('/getMenuList', function (req, res) {
         var result = [];
         for(var k in JSON.parse(fulfilled).rows) {
             var temp = JSON.parse(fulfilled).rows[k];
-            result.push({productname:temp.productname,
-                productdescription:temp.productdescription,
-                productsize:temp.productsize,
-                productprice:temp.productprice
+            result.push({
+                productid: temp.productid,
+                productname:temp.productname,
+                productdescription:temp.description,
+                productsizeid: temp.productsizeid,
+                productsize:temp.size,
+                productprice:temp.price
             });
         }
         res.contentType('application/json');
         res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+app.post('/addCafeProgram', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        name: req.body.programName,
+        cafes: req.body.cafes,
+        threshold: req.body.rewardThreshold,
+        visitPoints: req.body.visitPoints,
+        paybackPoints: req.body.paybackPoints
+    }),'/addCafePrograms').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/manageRewards'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.post('/getCafePrograms', function (req, res) {
+    utils.persistenceServiceCallSansParams('/getCafePrograms').then(function(fulfilled){
+        var result = [];
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({
+                programId: temp.programid,
+                programName:temp.programname,
+                threshold:temp.rewardthreshold,
+                paybackPoints: temp.paybackpoints,
+                visitPoints:temp.visitpoints,
+                cafes: temp.cafes
+            });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.post('/updateProgramDetails', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        programid: req.body.programId,
+        name: req.body.uprogramName,
+        //cafes: req.body.ucafes,
+        threshold: req.body.urewardThreshold,
+        visitPoints: req.body.uvisitPoints,
+        paybackPoints: req.body.upaybackPoints
+    }),'/updateProgramDetails').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/manageRewards'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/archiveProducts', function (req, res) {
+    utils.persistenceServiceCallSansParams('/archiveProducts').then(function(fulfilled){
+        var result = [];
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({
+                productid: temp.productid,
+                productname:temp.productname,
+                productdescription:temp.description,
+                productsizeid: temp.productsizeid,
+                productsize:temp.size,
+                productprice:temp.price
+            });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/getProductToRestore', function(req, res) {
+    console.log(req.query.id);
+
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        pId: req.query.id,
+        pSizeId: req.query.sizeid
+    }),'/restoreProduct').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/viewProduct'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/archiveProgram', function(req, res) {
+    console.log(req.query.id);
+
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        programId: req.query.programId
+    }),'/archiveProgram').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/manageRewards'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/archivedPrograms', function (req, res) {
+    utils.persistenceServiceCallSansParams('/archivedPrograms').then(function(fulfilled){
+        var result = [];
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({
+                programId: temp.programid,
+                programName:temp.programname,
+                threshold:temp.rewardthreshold,
+                paybackPoints: temp.paybackpoints,
+                visitPoints:temp.visitpoints,
+                cafes: temp.cafes
+            });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/getProgramToRestore', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        programId: req.query.id
+    }),'/programToRestore').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/manageRewards'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.post('/addAddOns', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        name: req.body.pNewName,
+        type: req.body.pNewType,
+        quantity: req.body.pNewQuantity,
+        price: req.body.pNewPrice
+    }),'/addAddOns').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/addOns'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.post('/getAddOnsList', function (req, res) {
+    utils.persistenceServiceCallSansParams('/getAddOnsList').then(function(fulfilled){
+        var result = [];
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({
+                addonid:temp.addonid,
+                addonname:temp.name,
+                addontype:temp.type,
+                addonquantity:temp.quantity,
+                addonprice:temp.price
+            });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result));
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/addOnToArchive', function(req, res) {
+    console.log(req.query.id);
+
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        addOnId: req.query.id
+    }),'/archiveAddOn').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/addOns'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.post('/UpdateAddOns', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        name: req.body.pUpdateName,
+        type: req.body.pUpdateType,
+        quantity: req.body.pUpdateQuantity,
+        price: req.body.pUpdatePrice,
+        addOnId: req.body.addOnId
+    }),'/UpdateAddOns').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/addOns'
+        });
+        res.end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/archivedAddOns', function (req, res) {
+    utils.persistenceServiceCallSansParams('/archivedAddOns').then(function(fulfilled){
+        var result = [];
+        for(var k in JSON.parse(fulfilled).rows) {
+            var temp = JSON.parse(fulfilled).rows[k];
+            result.push({
+                addOnId: temp.addonid,
+                name:temp.name,
+                type:temp.type,
+                quantity: temp.quantity,
+                price:temp.price
+            });
+        }
+        res.contentType('application/json');
+        res.send(JSON.stringify(result)).end();
+    }).catch(function(error){
+        console.log(error);
+    });
+});
+
+
+app.get('/getAddOnToRestore', function(req, res) {
+    utils.persistenceServiceCallWithParams(querystring.stringify({
+        addOnId: req.query.id
+    }),'/addOnToRestore').then(function(fulfilled){
+        res.writeHead(302,{
+            'Location': '/addOns'
+        });
+        res.end();
     }).catch(function(error){
         console.log(error);
     });

@@ -22,6 +22,8 @@
         var removeIndexVP1 = undefined;
         var removeIndexVP = undefined;
         var rowToAddVP = undefined;
+        /*var productSizeId = undefined;
+        var productId = undefined;*/
 
         var toolbar = [{
             text:'Delete',
@@ -40,8 +42,10 @@
                                 $('#vp').datagrid('insertRow', {
                                     index: 0,
                                     row:{
+                                        productid:rowToAddVP.productid,
                                         productname:rowToAddVP.productname,
                                         productdescription:rowToAddVP.productdescription,
+                                        productsizeid:rowToAddVP.productsizeid,
                                         productsize:rowToAddVP.productsize,
                                         productprice:rowToAddVP.productprice
                                     }
@@ -61,8 +65,10 @@
             dg1.datagrid('insertRow',{
                 index: 0,
                 row:{
+                    productid:data.productid,
                     productname:data.productname,
                     productdescription:data.productdescription,
+                    productsizeid:data.productsizeid,
                     productsize:data.productsize,
                     productprice:data.productprice
                 }
@@ -99,19 +105,24 @@
                     removeIndexVP = index;
                 },
                 columns:[[
+                    {field:'productid',title:'Product Id',width:100,sortable:true},
                     {field:'productname',title:'Product Name',width:100,sortable:true},
                     {field:'productdescription',title:'Product Description',width:100,sortable:true},
+                    {field:'productsizeid',title:'Product SizeId',width:100,sortable:true},
                     {field:'productsize',title:'Product Size',width:100,sortable:true},
                     {field:'productprice',title:'Product Price',width:100,sortable:true}
                 ]],
                 detailFormatter: function(rowIndex, rowData){
+                   /* productSizeId = rowData.productSizeid;
+                    productId = rowData.productid;*/
+
                     return '<table>' +
-                        '<td style="border:0">  + rowData.productname + </a> </td>'
-                        + '<td>' + rowData.description +'</td>'
-                        + '<td>' + rowData.size +'</td>'
-                        + '<td>' + rowData.productPrice +'</td>'
-                        + '<td> <input type="hidden" name="productSizeId" id="hiddenProductSizeId" value=' + rowData.productsizeid + '></td>'
-                        + '<td> <input type="hidden" name="productId" id="hiddenProductId" value=' + rowData.productsizeid + '></td>'
+                        + '<td>' + rowData.productid +'</td>'
+                        + '<td style="border:0">  + rowData.productname + </a> </td>'
+                        + '<td>' + rowData.productdescription +'</td>'
+                        + '<td>' + rowData.productsizeid +'</td>'
+                        + '<td>' + rowData.productsize +'</td>'
+                        + '<td>' + rowData.productprice +'</td>'
                     '</table>';
                 }
             });
@@ -144,8 +155,10 @@
             <table id="vp1" class="easyui-datagrid" style="width:550px;height:600px; padding:10px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar">
                 <thead>
                 <tr>
+                    <th data-options="field:'productid',width:100">Product Id</th>
                     <th data-options="field:'productname',width:100">Product Name</th>
                     <th data-options="field:'productdescription',width:100">Product Description</th>
+                    <th data-options="field:'productsizeid',width:100">Product SizeId</th>
                     <th data-options="field:'productsize',width:100,align:'right'">Product Size</th>
                     <th data-options="field:'productprice',width:100,align:'right'">Product Price</th>
                 </tr>

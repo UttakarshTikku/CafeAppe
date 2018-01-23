@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Rewards</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+
+    <script>
+
+        var rowToRestore = undefined;
+
+        function openWindow() {
+            $('#archivedWindow').window({
+                width:650,
+                height:400,
+                modal:true,
+                title:'Archived Programs',
+                collapsible:false,
+                minimizable:false,
+                maximizable:false,
+                closed:false
+            });
+
+            var data = $.getJSON('/archivedPrograms', function(abc) {
+                $('#vp1').datagrid({
+                    data: abc,
+                    onClickRow: function (index, row) {
+                        rowToRestore = row;
+                    }
+                });
+            });
+        }
+
+
+        var toolbar = [{
+            text:'Create Program',
+            iconCls:'icon-add',
+            handler:function(){
+                $('#win').dialog({
+                    title: "Create New Loyalty Program",
+                    width: '360px',
+                    height: '350px',
+                    closed: false,
+                    cache: false,
+                    modal: true
+                });
+            }
+        }];
+
+
+        var toolbar1 = [{
+            text:'Restore',
+            iconCls:'icon-undo',
+            handler:function(){
+                $.messager.confirm('Confirm','Are you sure you want to restore the archived product?',function(r){
+                    if (r){
+                        if(rowToRestore != undefined){
+                            window.location.href ='/getProgramToRestore?id='+ rowToRestore.programId
+                            rowToRestore = undefined;
+                        }
+                    }
+                });
+            }
+        }]
+
+
+        $(document).ready(function(){
+            $('#tt').datagrid({
+                width:1000,
+                height:250,
+                remoteSort:false,
+                singleSelect:true,
+                nowrap:false,
+                fitColumns:true,
+                url:'/getCafePrograms',
+                columns:[[
+                    {field:'programId',title:'ProgramId',width:100,sortable:true},
+                    {field:'programName',title:'Program Name',width:100,sortable:true},
+                    {field:'threshold',title:'Threshold Points',width:100,sortable:true},
+                    {field:'paybackPoints',title:'Payback Points',width:100,sortable:true},
+                    {field:'visitPoints',title:'Visit Points',width:100,sortable:true},
+                    {field:'cafes',title:'Cafes',width:100,sortable:true}
+                ]],
+                detailFormatter: function(rowIndex, rowData){
+                    return '<table><tr>' +
+                        '<td style="border:0">' + rowData.programid + ' </a> </td>'
+                        + '<td>' + rowData.programName +'</td>'
+                        + '<td>' + rowData.threshold +'</td>'
+                        + '<td>' + rowData.paybackPoints +'</td>'
+                        + '<td>' + rowData.visitPoints +'</td>'
+                        + '<td>' + rowData.cafes +'</td>'
+                    '</tr></table>';
+                },
+                onDblClickRow: function(rowIndex, rowData){
+
+                    $('#updateProgramButton').hide();
+                    $('#resetProgramButton').hide();
+                    $('#uprogramName').attr('readOnly', true);
+                    $('#ucafes').combo('readonly', true);
+                    $('#urewardThreshold').attr('readOnly', true);
+                    $('#uvisitPoints').attr('readOnly', true);
+                    $('#upaybackPoints').attr('readOnly', true);
+
+                    $('#dd').window({
+                        title: rowData.programName,
+                        width: 400,
+                        height: 250,
+                        closed: false,
+                        cache: false,
+                        modal: true,
+                        collapsible:false,
+                        minimizable:false,
+                        maximizable:false,
+                    });
+
+                    $('#programDetails').form('load',{
+                        uprogramName:rowData.programName,
+                        urewardThreshold:rowData.threshold,
+                        uvisitPoints:rowData.paybackPoints,
+                        upaybackPoints:rowData.visitPoints,
+                        ucafes:rowData.cafes,
+                        programId:rowData.programId
+                    });
+                }
+            });
+
+        });
+
+        function formatItem(row){
+            var s = '<span style="font-weight:bold">' + row.cafeid + '</span><br/>' +
+                '<span style="color:#888">' + row.cafename + '</span>';
+            return s;
+        }
+
+        function archiveOffer(){
+            $.messager.confirm('Confirm','Are you sure you want to archive this program?',function(r){
+                if (r){
+                    window.location.href ='/archiveProgram?programId='+document.getElementById('hiddenUpdateProgramId').value;
+                }
+            });
+        }
+
+        function editOfferInformation() {
+            $('#updateProgramButton').show();
+            $('#resetProgramButton').show();
+            $('#uprogramName').attr('readOnly', false);
+            $('#ucafes').combo('readonly', false);
+            $('#urewardThreshold').attr('readOnly', false);
+            $('#uvisitPoints').attr('readOnly', false);
+            $('#upaybackPoints').attr('readOnly', false);
+        }
+    </script>
+
+</head>
+<body>
+
+<h1>Reward Points</h1>
+<table id="tt" data-options="toolbar:toolbar"></table>
+
+<div id="dd" class="easyui-window" style="width:400px;height:200px;"
+     data-options="tools:'#tools',resizable:false,modal:true" closed=true>
+    <form id = "programDetails" method="post" action ="/updateProgramDetails">
+        <table style='padding:2px'>
+            <tr><td>
+                ProgramName:</td><td>
+                <input type= "text" id="uprogramName" name="uprogramName"  required/>
+            </td></tr>
+            <tr>
+                <td>Cafe Selection:</td>
+                <td><input type= "text" id="ucafes" name="ucafes" class="easyui-combobox" data-options="valueField:'cafeid',
+                        url: '/getCafeList',
+                        textField: 'cafename',
+                        panelWidth: 350,
+                        panelHeight: 'auto',
+                        multiple: true,
+                        formatter: formatItem,
+                        labelPosition: 'top'" ></td>
+            </tr>
+            <tr>
+                <td>RewardThreshold:</td>
+                <td><input type= "text" id="urewardThreshold" name="urewardThreshold"  required></td>
+            </tr>
+            <tr>
+                <td>Visit Points:</td>
+                <td><input type= "text" id="uvisitPoints" name="uvisitPoints"  required></td>
+            </tr>
+            <tr>
+                <td>PayBackPoints:</td>
+                <td>
+                    <input type="text" id="upaybackPoints" name="upaybackPoints" required/>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="programId" id="hiddenUpdateProgramId">
+        <input id = "updateProgramButton" type = "submit" value="Update"/>
+        <td><input type="reset" id="resetProgramButton" name="resetProgramButton" name="Reset"></td>
+    </form>
+</div>
+
+<div id="win" class="easyui-window" title="Add New Cafe" style="width:1000px;height:800px;" closed="true">
+    <h1>Create New Promotion</h1>
+    <form style="margin-left: auto; margin-right: auto; padding: 10px" action = "/addCafeProgram" method="post">
+        <table style='padding:2px'>
+            <tr><td>
+                ProgramName:</td><td>
+                <input type= "text" id="programName" name="programName"  required/>
+            </td></tr>
+            <tr>
+                <td>Cafe Selection:</td>
+                <td><input type= "text" id="cafes" name="cafes" class="easyui-combobox" data-options="valueField:'cafeid',
+                        url: '/getCafeList',
+                        textField: 'cafename',
+                        panelWidth: 350,
+                        panelHeight: 'auto',
+                        multiple: true,
+                        formatter: formatItem,
+                        labelPosition: 'top'" ></td>
+            </tr>
+            <tr>
+                <td>RewardThreshold:</td>
+                <td><input type= "text" id="rewardThreshold" name="rewardThreshold"  required></td>
+            </tr>
+            <tr>
+                <td>Visit Points:</td>
+                <td><input type= "text" id="visitPoints" name="visitPoints"  required></td>
+            </tr>
+            <tr>
+                <td>PayBackPoints:</td>
+                <td>
+                    <input type= "text" id="paybackPoints" name="paybackPoints"  required/>
+                </td>
+            </tr>
+        </table>
+        <input type = "submit" value="Add"/>
+    </form>
+</div>
+
+<div id="tools">
+    <a class="icon-edit" onclick="editOfferInformation()"></a>
+    <a class="icon-remove" onclick="archiveOffer()"></a>
+</div>
+
+<div id="archivedWindow" class="easyui-window" closed="true">
+    <table id="vp1" class="easyui-datagrid" style="width:650px;height:400px; padding:10px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar1">
+        <thead>
+        <tr>
+            <th data-options="field:'programId',width:100">Program Id</th>
+            <th data-options="field:'programName',width:100">Program Name</th>
+            <th data-options="field:'threshold',width:100">Threshold</th>
+            <th data-options="field:'paybackPoints',width:100">Payback Points</th>
+            <th data-options="field:'visitPoints',width:100,align:'right'">Visit Points</th>
+            <th data-options="field:'cafes',width:100,align:'right'">Cafes</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+
+<p><a href = "javascript: void(0);" onclick="openWindow()">View Archived Offers...</a></p>
+<p><a href = "/admin">Home</a></p>
+
+</body>
+</html>

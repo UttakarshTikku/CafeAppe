@@ -8,9 +8,33 @@
     <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
-    <script>src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"</script>
 
     <script>
+
+
+        var rowToRestore = undefined;
+
+        function openWindow() {
+            $('#archivedWindow').window({
+                width:650,
+                height:400,
+                modal:true,
+                title:'Archived Products',
+                collapsible:false,
+                minimizable:false,
+                maximizable:false,
+                closed:false
+            });
+
+            var data = $.getJSON('/archiveProducts', function(abc) {
+                $('#vp1').datagrid({
+                    data: abc,
+                    onClickRow: function (index, row) {
+                        rowToRestore = row;
+                    }
+                });
+            });
+        }
 
         var toolbar = [{
             text:'Add',
@@ -20,7 +44,69 @@
             }
         }]
 
+
+        var toolbar1 = [{
+            text:'Restore',
+            iconCls:'icon-undo',
+            handler:function(){
+                $.messager.confirm('Confirm','Are you sure you want to restore the archived product?',function(r){
+                    if (r){
+                        if(rowToRestore != undefined){
+                            window.location.href ='/getProductToRestore?id='+ rowToRestore.productid
+                                + '&sizeid='+rowToRestore.productsizeid
+                            rowToRestore = undefined;
+                        }
+                    }
+                });
+            }
+        }]
+
         $(document).ready(function(){
+
+
+            var sizeCount = 1;
+            var priceCount = 1;
+
+            if(sizeCount == 1)
+                $("#pRemove").hide();
+
+            $("#pAdd").click(function () {
+                var size = 'pSize'+sizeCount;
+                var price = 'pPrice'+priceCount;
+                //console.log(pSize);
+                $(".add").before("<tr class = \"nSize\">\n" +
+                    "            <td>Product Size</td>\n" +
+                    "            <td><input type= \"text\" id="+size+" name="+size+" placeholder=\"Enter product size\" required></td>\n" +
+                    "        </tr>\n" +
+                    "        <tr class = \"nSize\">\n" +
+                    "            <td>Product Price</td>\n" +
+                    "            <td><input type= \"text\" id="+price+" name="+price+" placeholder=\"Enter product Price\" required></td>\n" +
+                    "        </tr>");
+                sizeCount++;
+                priceCount++;
+                $("#pRemove").show();
+            });
+
+            $("#pRemove").click(function () {
+                var size = 'pSize'+(--sizeCount);
+                var price = 'pPrice'+(--priceCount);
+                //console.log(pSize);
+                $(".nSize").remove();
+                if(sizeCount == 1)
+                    $("#pRemove").hide();
+            });
+
+            $("#pNewSubmit").click(function () {
+                var data = [];
+                for(var k=0; k<sizeCount; k++){
+                    //console.log('pSize'+k);
+                    data.push({size: document.getElementById('pSize'+k).value, price: document.getElementById('pPrice'+k).value})
+                }
+                $("#pPriceHidden").val(JSON.stringify(data));
+                $("#pSizeHidden").val(sizeCount);
+            });
+
+
             $('#vp').datagrid({
                 width:1000,
                 height:250,
@@ -114,19 +200,19 @@
         <table>
             <tr>
                 <td>Product Name</td>
-                <td><input type= "text" id="pUpdateName" name="pUpdateName" placeholder="Enter product name"></td>
+                <td><input type= "text" id="pUpdateName" name="pUpdateName" placeholder="Enter product name" required></td>
             </tr>
             <tr>
                 <td>Product Description</td>
-                <td><textarea  id="pUpdateDesc"  name="pUpdateDesc" placeholder="Product Description"></textarea></td>
+                <td><textarea  id="pUpdateDesc"  name="pUpdateDesc" placeholder="Product Description" required></textarea></td>
             </tr>
             <tr>
                 <td>Product Size</td>
-                <td><input type= "text" id="pUpdateSize" name="pUpdateSize" placeholder="Enter product size"></td>
+                <td><input type= "text" id="pUpdateSize" name="pUpdateSize" placeholder="Enter product size" required></td>
             </tr>
             <tr>
                 <td>Product Price</td>
-                <td><input type= "text" id="pUpdatePrice" name="pUpdatePrice" placeholder="Enter product Price"></td>
+                <td><input type= "text" id="pUpdatePrice" name="pUpdatePrice" placeholder="Enter product Price" required></td>
             </tr>
             <tr>
                 <td><input type="submit" id="pUpdateSubmit" name="pUpdateSubmit" name="Update" ></td>
@@ -143,31 +229,54 @@
         <table>
             <tr>
                 <td>Product Name</td>
-                <td><input type= "text" id="pNewName" name="pNewName" placeholder="Enter product name" ></td>
+                <td><input type= "text" id="pNewName" name="pNewName" placeholder="Enter product name" required></td>
             </tr>
             <tr>
                 <td>Product Description</td>
-                <td><textarea  id="pNewDesc"  name="pNewDesc" placeholder="Product Description" ></textarea></td>
+                <td><textarea  id="pNewDesc"  name="pNewDesc" placeholder="Product Description" required></textarea></td>
             </tr>
             <tr>
                 <td>Product Size</td>
-                <td><input type= "text" id="pNewSize" name="pNewSize" placeholder="Enter product size" ></td>
+                <td><input type= "text" id="pSize0" name="pSize0" placeholder="Enter product size" required></td>
             </tr>
             <tr>
                 <td>Product Price</td>
-                <td><input type= "text" id="pNewPrice" name="pNewPrice" placeholder="Enter product Price" ></td>
+                <td><input type= "text" id="pPrice0" name="pPrice0" placeholder="Enter product Price" required></td>
+            </tr>
+            <tr class = "add">
+                <td><input type= "button" id="pAdd" name="pAdd" value="Add another Size"></td>
+                <td><input type= "button" id="pRemove" name="pRemove" value="Remove"></td>
             </tr>
             <tr>
                 <td><input type="submit" id="pNewSubmit" name="pNewSubmit" name="Submit" ></td>
                 <td><input type="reset" id="pNewReset" name="pNewSubmit" name="Reset"></td>
             </tr>
         </table>
+        <input type="hidden" id="pPriceHidden" name="pPriceHidden">
+        <input type="hidden" id="pSizeHidden" name="pSizeHidden">
     </form>
 </div>
 
+<div id="archivedWindow" class="easyui-window" closed="true">
+    <table id="vp1" class="easyui-datagrid" style="width:650px;height:400px; padding:10px" data-options="fitColumns:true,singleSelect:true, toolbar:toolbar1">
+        <thead>
+        <tr>
+            <th data-options="field:'productid',width:100">Product Id</th>
+            <th data-options="field:'productname',width:100">Product Name</th>
+            <th data-options="field:'productdescription',width:100">Product Description</th>
+            <th data-options="field:'productsizeid',width:100">Product SizeId</th>
+            <th data-options="field:'productsize',width:100,align:'right'">Product Size</th>
+            <th data-options="field:'productprice',width:100,align:'right'">Product Price</th>
+        </tr>
+        </thead>
+    </table>
+</div>
 
 <p><a href = "/addProduct">Add new Product</a></p>
 <p><a href = "/archivedCafe">View Archived Cafes...</a></p>
 <p><a href = "/Menu">View Menu</a></p>
+<p><a href = "javascript:void(0)"  onclick="openWindow()">Archive Products</a></p>
+<p><a href = "/addOns">AddOns</a></p>
+<p><a href = "/admin">Home</a></p>
 </body>
 </html>

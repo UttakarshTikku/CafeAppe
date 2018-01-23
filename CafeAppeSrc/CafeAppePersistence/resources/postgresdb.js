@@ -1,13 +1,13 @@
-var Pool = require('pg-pool');
+var pg = require('../../node-postgres-todo/node_modules/pg');
 
-var connPool = new Pool({
-  host: '127.0.0.1',
+var connPool = new pg.Pool({
+  host: 'localhost',
   port: 5432,
-  database: 'postgres',
-  user: 'dev',
-  password: 'dev',
+  database: 'akhileshlamba',
+  user: 'akhileshlamba',
   max: 20,
-  min: 4
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
 });
 
 module.exports = connPool;

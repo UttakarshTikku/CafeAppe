@@ -9,5 +9,8 @@ module.exports.PATH = Object.freeze({
     VIEW_ARCHIVED_CAFES: '/CafeAppeClient/html/archivedCafes.html',
     MANAGE_PRODUCT_PATH: '/CafeAppeClient/html/manageProduct.html',
     MENU_PATH: '/CafeAppeClient/html/Menu.html',
-    OPEN_MENU_PATH: '/CafeAppeClient/html/createMenu.html'
+    OPEN_MENU_PATH: '/CafeAppeClient/html/createMenu.html',
+    MANAGE_OFFERS_PATH: '/CafeAppeClient/html/manageOffers.html',
+    MANAGE_REWARDS_PATH: '/CafeAppeClient/html/manageRewards.html',
+    ADDONS_PATH: '/CafeAppeClient/html/addOns.html'
 });

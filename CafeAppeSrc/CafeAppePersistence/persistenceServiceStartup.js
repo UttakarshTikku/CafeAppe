@@ -4,6 +4,7 @@ var constants = require('./resources/constants');
  var productDAO = require('./DAO/ProductDAO');
  var cafeDAO = require('./DAO/CafeDAO');
  var generalDAO = require('./DAO/GeneralDAO');
+var cafeProgramDAO = require('./DAO/CafeProgramDAO');
 
 var app = express();
 var bodyParser = require("../node-postgres-todo/node_modules/body-parser");
@@ -70,6 +71,29 @@ app.post('/addProductSubmits', function (req, res){
 });
 
 
+app.post('/addProductSubmits1', function (req, res){
+
+    var priceSize = JSON.parse(req.body.priceSize);
+    var a = async () => {
+        await productDAO.createProduct1(1, req.body.name, true, 1, new Date(), new Date(), 1, req.body.desc,priceSize,1.12)
+    }
+    return a();
+});
+
+app.post('/addProductSubmits2', function (req, res){
+
+    var priceSize = JSON.parse(req.body.priceSize);
+    var a = function() {
+        productDAO.createProduct2(1, req.body.name, true, 1, new Date(), new Date(), 1, req.body.desc,priceSize,1.12).then(function (fulfilled) {
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
 app.post('/getProductsList', function (req, res){
     var a = function(){
         productDAO.viewProduct().then(function(fulfilled){
@@ -83,6 +107,17 @@ app.post('/getProductsList', function (req, res){
 });
 
 app.post('/getProduct', function (req, res){
+    var a = function(){
+        productDAO.getProduct(req.body.id).then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+app.post('/getProductById', function (req, res){
     var a = function(){
         productDAO.getProduct(req.body.id).then(function(fulfilled){
             return res.send(fulfilled);
@@ -144,7 +179,7 @@ app.post('/deleteMenu', function (req, res){
 
 app.post('/createMenuSubmit', function (req, res){
     var a = function() {
-        productDAO.createMenuPromise(1, req.body.pName, req.body.pDesc, req.body.pSize, req.body.pPrice, 1, new Date(), 1, new Date())
+        productDAO.createMenuPromise(req.body.cafeId, req.body.pId, req.body.psId, 1, new Date(), 1, new Date())
             .then(function (fulfilled) {
                 return res.send(fulfilled);
             })
@@ -163,6 +198,212 @@ app.post('/viewMenu', function (req, res){
         }).catch(function (error) {
             console.log(error);
         });
+    }
+    return a();
+});
+
+
+app.post('/addCafePrograms', function (req, res){
+    var a = function() {
+        console.log(req.body.cafes);
+        cafeProgramDAO.createRewards(req.body.name, req.body.threshold, req.body.visitPoints, req.body.paybackPoints).then(
+            cafeProgramDAO.cafeProgram(req.body.cafes)
+                .then(function (fulfilled) {
+                    return res.send(fulfilled)
+                }).catch(function (error) {
+                console.log(error);
+            })).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/getCafePrograms', function (req, res){
+    var a = function(){
+        cafeProgramDAO.getProgram().then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/updateProgramDetails', function (req, res){
+    var a = function() {
+        //console.log(req.body.cafes);
+        cafeProgramDAO.updateRewards(req.body.programid, req.body.name, req.body.threshold, req.body.visitPoints, req.body.paybackPoints)/*.then(
+            cafeProgramDAO.updateCafeProgram(req.body.programid, req.body.cafes)
+                .then(function (fulfilled) {
+                    return res.send(fulfilled)
+                }).catch(function (error) {
+                console.log(error);
+            }))*/.then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/archiveProducts', function (req, res){
+    var a = function(){
+        productDAO.getArchiveProducts().then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/restoreProduct', function (req, res){
+    var a = function() {
+        productDAO.restoreProduct(req.body.pId)
+            .then(function (fulfilled) {
+            }).then(productDAO.restoreProductSize(req.body.pId, req.body.pSizeId).then(
+            function (fulfilled) {
+                return res.send(fulfilled);
+            }).catch(function (error) {
+            console.log(error);
+        })
+            .catch(function (error) {
+                console.log(error);
+            }));
+    }
+    return a();
+});
+
+
+app.post('/archiveProgram', function (req, res){
+    var a = function() {
+        cafeProgramDAO.archiveProgramRule(req.body.programId)
+            .then(function (fulfilled) {
+            }).then(cafeProgramDAO.archiveCafeProgram(req.body.programId).then(
+            function (fulfilled) {
+                return res.send(fulfilled);
+            }).catch(function (error) {
+            console.log(error);
+        })
+            .catch(function (error) {
+                console.log(error);
+            }));
+    }
+    return a();
+});
+
+
+app.post('/archivedPrograms', function (req, res){
+    var a = function(){
+        cafeProgramDAO.getArchivedPrograms().then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/programToRestore', function (req, res){
+    var a = function() {
+        cafeProgramDAO.restoreProgramRule(req.body.programId)
+            .then(function (fulfilled) {
+            }).then(cafeProgramDAO.restoreCafeProgram(req.body.programId).then(
+            function (fulfilled) {
+                return res.send(fulfilled);
+            }).catch(function (error) {
+            console.log(error);
+        })
+            .catch(function (error) {
+                console.log(error);
+            }));
+    }
+    return a();
+});
+
+
+app.post('/addAddOns', function (req, res){
+    //console.log(req.body.price);
+    var result = '';
+    var a = function() {
+        productDAO.createAddOn1(req.body.name, req.body.type, req.body.quantity, req.body.price, 1, new Date(), new Date(), 1)
+            .then(function (fulfilled) {
+                return res.send(fulfilled);
+            }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/getAddOnsList', function (req, res){
+    var a = function(){
+        productDAO.getAddons().then(function(fulfilled){
+            // console.log(fulfilled);
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/archiveAddOn', function (req, res){
+    var a = function() {
+        productDAO.archiveAddOn(req.body.addOnId)
+            .then(function (fulfilled) {
+                return res.send(fulfilled);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    return a();
+});
+
+
+app.post('/updateAddOns', function (req, res){
+    var a = function() {
+        //console.log(req.body.cafes);
+        productDAO.updateAddOns(req.body.addOnId, req.body.name, req.body.type,
+            req.body.quantity, req.body.price).then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/archivedAddOns', function (req, res){
+    var a = function(){
+        productDAO.getArchivedAddOns().then(function(fulfilled){
+            return res.send(fulfilled);
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    return a();
+});
+
+
+app.post('/addOnToRestore', function (req, res){
+    var a = function() {
+        productDAO.restoreAddOn(req.body.addOnId)
+            .then(function (fulfilled) {
+            }).catch(function (error) {
+                console.log(error);
+            });
     }
     return a();
 });
